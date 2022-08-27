@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: movement-service
+  cloud:
+    config:
+      enabled: true
+      uri: http://localhost:8888
+  security:
+    user:
+      name: root
+      password: root
