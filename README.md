@@ -1,0 +1,2 @@
+# ApiSeparadas
+Microservicio BC32
