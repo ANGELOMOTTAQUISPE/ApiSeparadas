@@ -1,0 +1,14 @@
+server:
+  port: 8088
+spring:
+  application:
+    name: movement_microservice
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/businessbanking
+eureka:
+  instance:
+    instance-id: ${spring:application:name}:${random:uuid}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8099/eureka
