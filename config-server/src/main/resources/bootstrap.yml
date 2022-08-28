@@ -8,8 +8,9 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/ANGELOMOTTAQUISPE/service-configuration.git
-          #searchPaths: config-data
+          default-label: ApiSeparadas
+          uri: https://github.com/ANGELOMOTTAQUISPE/ApiSeparadas.git
+          searchPaths: config-data
           username: ${GIT_USER}
           password: ${GIT_PASSWORD}
   security:
