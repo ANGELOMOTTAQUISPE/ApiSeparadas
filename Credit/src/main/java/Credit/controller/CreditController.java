@@ -1,5 +1,7 @@
 package Credit.controller;
 
+import Credit.dto.Creditdto;
+import Credit.model.Client;
 import Credit.model.Credit;
 import Credit.service.ICreditService;
 import org.slf4j.Logger;
@@ -36,10 +38,19 @@ public class CreditController {
         return new ResponseEntity<Flux<Credit>>(lista, HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<Mono<Credit>> register(@RequestBody Credit credit){
-
+    public ResponseEntity<Mono<Credit>> register(@RequestBody Creditdto creditdto){
         logger.info("Inicio metodo register() de CreditController");
+        Client client = Client.builder()
+                .idClient(creditdto.getIdClient())
+                .documentNumber(creditdto.getDocumentNumber())
+                .build();
+        Credit credit = Credit.builder()
+                .creditCardNumber(creditdto.getCreditCardNumber())
+                .creditLine(creditdto.getCreditLine())
+                .client(client)
+                .build();
         Mono<Credit> p = service.register(credit);
+
         return new ResponseEntity<Mono<Credit>>(p, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")

@@ -1,5 +1,9 @@
 package Movement.controller;
 
+import Movement.dto.AccountMovementdto;
+import Movement.dto.CreditMovementdto;
+import Movement.model.Account;
+import Movement.model.Credit;
 import Movement.model.Movement;
 import Movement.service.IMovementService;
 import org.slf4j.Logger;
@@ -47,10 +51,45 @@ public class MovementController {
         return new ResponseEntity<Mono<Movement>>(p, HttpStatus.OK);
 
     }
-    @PostMapping
-    public ResponseEntity<Mono<Movement>> register(@RequestBody Movement movement){
+    @PostMapping("/accountmovement")
+    public ResponseEntity<Mono<Movement>> registeraccountmovement(@RequestBody AccountMovementdto accountmovement){
         logger.info("Inicio metodo register() de MovementController");
         Mono<Movement> p = null;
+        Account account = Account.builder()
+                .idAccount(accountmovement.getIdAccount())
+                .accountNumber(accountmovement.getAccountNumber())
+                .build();
+        Movement movement = Movement.builder()
+                .balance(accountmovement.getBalance())
+                .movement(accountmovement.getMovement())
+                .typeMovement(accountmovement.getTypeMovement())
+                .account(account)
+                .build();
+        try {
+            p = service.register(movement);
+
+        } catch (Exception e) {
+            logger.info("Ocurrio un error " + e.getMessage());
+
+        }finally {
+            logger.info( "Fin metodo register() de MovementController");
+        }
+        return new ResponseEntity<Mono<Movement>>(p, HttpStatus.CREATED);
+    }
+    @PostMapping("/creditmovement")
+    public ResponseEntity<Mono<Movement>> registercreditmovement(@RequestBody CreditMovementdto creditmovement){
+        logger.info("Inicio metodo register() de MovementController");
+        Mono<Movement> p = null;
+        Credit credit = Credit.builder()
+                .idCredit(creditmovement.getIdCredit())
+                .creditCardNumber(creditmovement.getCreditCardNumber())
+                .build();
+        Movement movement = Movement.builder()
+                .balance(creditmovement.getBalance())
+                .movement(creditmovement.getMovement())
+                .typeMovement(creditmovement.getTypeMovement())
+                .credit(credit)
+                .build();
         try {
             p = service.register(movement);
 

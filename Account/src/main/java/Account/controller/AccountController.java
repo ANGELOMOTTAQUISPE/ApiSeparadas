@@ -1,6 +1,8 @@
 package Account.controller;
 
+import Account.dto.Accountdto;
 import Account.model.Account;
+import Account.model.Client;
 import Account.service.IAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +34,20 @@ public class AccountController {
         return new ResponseEntity<Flux<Account>>(lista, HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<Mono<Account>> register(@RequestBody Account checking){
+    public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
         Mono<Account> p = null;
+        Client client = Client.builder()
+                .idClient(checkingdto.getIdClient())
+                .documentNumber(checkingdto.getDocumentNumber())
+                .build();
+        Account account = Account.builder()
+                .accountNumber(checkingdto.getAccountNumber())
+                .accountType(checkingdto.getAccountType())
+                .client(client)
+                .build();
         try {
-            p = service.register(checking);
+            p = service.register(account);
 
         } catch (Exception e) {
             logger.info("Ocurrio un error " + e.getMessage());

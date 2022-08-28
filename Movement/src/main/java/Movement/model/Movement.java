@@ -1,5 +1,6 @@
 package Movement.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +14,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Movement {
     @Id
     private String idMovement;
     private Double balance;
     private Double movement;
-    private String type;
+    private String typeMovement;
     private Account account;
     private Credit credit;
     private LocalDateTime movementDate ;
