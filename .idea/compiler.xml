@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="EurekaServer" />
+        <module name="Account" />
+        <module name="config-server" />
+        <module name="Credit" />
+        <module name="Movement" />
+        <module name="prjApiGateway" />
+        <module name="Client" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Account" target="11" />
+      <module name="Client" target="11" />
+      <module name="config-server" target="11" />
+      <module name="Credit" target="11" />
+      <module name="EurekaServer" target="11" />
+      <module name="Movement" target="11" />
+      <module name="prjApiGateway" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Account" options="-parameters" />
+      <module name="Client" options="-parameters" />
+      <module name="Credit" options="-parameters" />
+      <module name="EurekaServer" options="-parameters" />
+      <module name="Movement" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="prjApiGateway" options="-parameters" />
+    </option>
+  </component>
+</project>

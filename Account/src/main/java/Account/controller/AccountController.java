@@ -41,13 +41,16 @@ public class AccountController {
                 .idClient(checkingdto.getIdClient())
                 .documentNumber(checkingdto.getDocumentNumber())
                 .build();
+
         Account account = Account.builder()
                 .accountNumber(checkingdto.getAccountNumber())
                 .accountType(checkingdto.getAccountType())
+                .minimammount(checkingdto.getMinimammount())
                 .client(client)
                 .build();
+        Double ammountmovementInitial = checkingdto.getAmmountmovementInitial();
         try {
-            p = service.register(account);
+            p = service.register(account, ammountmovementInitial );
 
         } catch (Exception e) {
             logger.info("Ocurrio un error " + e.getMessage());

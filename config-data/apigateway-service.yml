@@ -1,12 +1,5 @@
 server:
   port: 8089
-
-eureka:
-  instance:
-    instance-id: ${spring:application:name}:${random:uuid}
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8099/eureka
 spring:
   application:
     name: apigateway
@@ -32,3 +25,9 @@ spring:
           uri: lb://ACCOUNT-SERVICE
           predicates:
             - Path=/api/account/**
+eureka:
+  instance:
+    instance-id: ${spring:application:name}:${random:uuid}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8099/eureka

@@ -29,7 +29,7 @@ public class CreditServiceImpl implements ICreditService {
         String documentNumber =obj.getClient().getDocumentNumber();
         return findByApiClient(obj.getClient())
                 .flatMap( cl -> {
-                    if(cl.getClientType().equals("personal")){
+                    if(cl.getTypeClient().getClientType().equals("personal")){
                         logger.info("personal");
                         Flux<Credit> lista = repo.findByClient(documentNumber);
                         Mono<Long> count = lista.count();
@@ -46,7 +46,7 @@ public class CreditServiceImpl implements ICreditService {
                                         return repo.save(obj);
                                     }
                                 });
-                    }else if(cl.getClientType().equals("empresarial")){
+                    }else if(cl.getTypeClient().getClientType().equals("empresarial")){
                         logger.info("empresarial: " + obj.getIdCredit() + " - " +  obj.getCreditCardNumber());
                         return repo.save(obj);
                     }else{

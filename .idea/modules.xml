@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Account/Account.iml" filepath="$PROJECT_DIR$/Account/Account.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Api separadas.iml" filepath="$PROJECT_DIR$/.idea/Api separadas.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Client/Client.iml" filepath="$PROJECT_DIR$/Client/Client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Credit/Credit.iml" filepath="$PROJECT_DIR$/Credit/Credit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EurekaServer/EurekaServer.iml" filepath="$PROJECT_DIR$/EurekaServer/EurekaServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Movement/Movement.iml" filepath="$PROJECT_DIR$/Movement/Movement.iml" />
+      <module fileurl="file://$PROJECT_DIR$/config-server/config-server.iml" filepath="$PROJECT_DIR$/config-server/config-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/prjApiGateway/prjApiGateway.iml" filepath="$PROJECT_DIR$/prjApiGateway/prjApiGateway.iml" />
+    </modules>
+  </component>
+</project>

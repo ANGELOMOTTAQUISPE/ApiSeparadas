@@ -1,7 +1,5 @@
 package Account.dto;
 
-import Account.model.Client;
-import Account.model.Fee;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +13,8 @@ import java.util.List;
 public class Accountdto {
     private String accountNumber;
     private String accountType;
+    private Double minimammount;
+    private Double ammountmovementInitial;
     private String idClient;
     private String documentNumber;
     private List<String> headline;
