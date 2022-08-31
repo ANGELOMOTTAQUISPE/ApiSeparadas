@@ -12,7 +12,9 @@ import reactor.core.publisher.Mono;
 public interface IMovementRepo extends ReactiveMongoRepository<Movement, String> {
 
     @Aggregation(pipeline = {"{ '$match': { 'account.accountNumber' : ?0 } }","{ '$sort' : { 'movementDate' : -1 } }","{'$limit': 1}"})
-    Mono<Movement> findlastMovementbyAccount(String accountNumber);
+    Mono<Movement> findlastMovementbyAccount(String accountNumber) ;
+    @Aggregation(pipeline = {"{ '$match': { 'credit.creditCardNumber' : ?0 } }","{ '$sort' : { 'movementDate' : -1 } }","{'$limit': 1}"})
+    Mono<Movement> findlastMovementbyCredit(String creditNumber);
     @Query(value = "{ 'credit.creditCardNumber': ?0 } ")
     Flux<Movement> findByCredit(String creditCardNumber);
 

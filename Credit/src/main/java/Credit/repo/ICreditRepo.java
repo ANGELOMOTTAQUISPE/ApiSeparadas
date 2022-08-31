@@ -12,6 +12,7 @@ public interface ICreditRepo extends ReactiveMongoRepository<Credit, String> {
     @Query(value = "{'client.documentNumber' : ?0 }")
     Flux<Credit> findByClient(String documentNumber);
 
+
     @Query(value = "{'client.documentNumber' : ?0 }")
     Mono<Long> CountByDocumentNumber(String documentNumber);
 }

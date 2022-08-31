@@ -56,20 +56,19 @@ public class MovementController {
     @PostMapping("/accountmovement")
     public ResponseEntity<Mono<Movement>> registeraccountmovement(@RequestBody AccountMovementdto accountmovement){
         logger.info("Inicio metodo register() de MovementController");
-        Mono<Movement> p = null;
+        Mono<Movement> p = Mono.empty();
         Account account = Account.builder()
                 .idAccount(accountmovement.getIdAccount())
                 .accountNumber(accountmovement.getAccountNumber())
                 .build();
         Movement movement = Movement.builder()
-                .balance(accountmovement.getBalance())
                 .movement(accountmovement.getMovement())
                 .typeMovement(accountmovement.getTypeMovement())
                 .account(account)
                 .movementDate(LocalDateTime.now())
                 .build();
         try {
-            p = service.register(movement);
+            p = service.registerAccount(movement);
 
         } catch (Exception e) {
             logger.info("Ocurrio un error " + e.getMessage());
@@ -82,19 +81,19 @@ public class MovementController {
     @PostMapping("/creditmovement")
     public ResponseEntity<Mono<Movement>> registercreditmovement(@RequestBody CreditMovementdto creditmovement){
         logger.info("Inicio metodo register() de MovementController");
-        Mono<Movement> p = null;
+        Mono<Movement> p = Mono.empty();
         Credit credit = Credit.builder()
                 .idCredit(creditmovement.getIdCredit())
                 .creditCardNumber(creditmovement.getCreditCardNumber())
                 .build();
         Movement movement = Movement.builder()
-                .balance(creditmovement.getBalance())
                 .movement(creditmovement.getMovement())
                 .typeMovement(creditmovement.getTypeMovement())
                 .credit(credit)
+                .movementDate(LocalDateTime.now())
                 .build();
         try {
-            p = service.register(movement);
+            p = service.registerCredit(movement);
 
         } catch (Exception e) {
             logger.info("Ocurrio un error " + e.getMessage());

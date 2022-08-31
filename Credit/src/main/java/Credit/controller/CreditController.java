@@ -37,6 +37,8 @@ public class CreditController {
         }
         return new ResponseEntity<Flux<Credit>>(lista, HttpStatus.OK);
     }
+
+
     @PostMapping
     public ResponseEntity<Mono<Credit>> register(@RequestBody Creditdto creditdto){
         logger.info("Inicio metodo register() de CreditController");
@@ -80,5 +82,12 @@ public class CreditController {
         Flux<Credit> credit = service.listCreditByDocumentNumberClient(documentNumber);
 
         return new ResponseEntity<Flux<Credit>>(credit, HttpStatus.OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Mono<Credit>> listCreditById(@PathVariable("id") String id){
+        logger.info("Inicio metodo listCreditById() de CreditController");
+        Mono<Credit> credit = service.listofId(id);
+        logger.info("FIN metodo listCreditById() de CreditController");
+        return new ResponseEntity<Mono<Credit>>(credit, HttpStatus.OK);
     }
 }

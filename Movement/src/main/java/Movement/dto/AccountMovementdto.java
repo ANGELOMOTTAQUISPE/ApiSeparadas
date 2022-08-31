@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountMovementdto {
-    private Double balance;
+
     private Double movement;
     private String typeMovement;
     private String idAccount;
