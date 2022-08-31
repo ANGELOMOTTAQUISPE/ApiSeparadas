@@ -23,5 +23,5 @@ public class Movement {
     private String typeMovement;
     private Account account;
     private Credit credit;
-    private LocalDateTime movementDate ;
+    private LocalDateTime movementDate;
 }

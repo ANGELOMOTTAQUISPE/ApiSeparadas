@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/movement")
 public class MovementController {
@@ -64,6 +66,7 @@ public class MovementController {
                 .movement(accountmovement.getMovement())
                 .typeMovement(accountmovement.getTypeMovement())
                 .account(account)
+                .movementDate(LocalDateTime.now())
                 .build();
         try {
             p = service.register(movement);
