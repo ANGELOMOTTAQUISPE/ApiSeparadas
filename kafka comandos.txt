@@ -1,0 +1,9 @@
+Iniciar zookeeper
+.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+Iniciar kafka
+.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+.\bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 partitions 1 --topic TOPIC-DEMO
+
+.\bin\windows\kafka-topics.bat --create --topic TOPIC-DEMO --bootstrap-server localhost:9092

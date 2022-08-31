@@ -37,9 +37,14 @@ public class AccountController {
     public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
         Mono<Account> p = null;
+        /*TypeClient typeClient = TypeClient.builder()
+                .clientType(checkingdto.)
+                .profile()
+                .build();*/
         Client client = Client.builder()
                 .idClient(checkingdto.getIdClient())
                 .documentNumber(checkingdto.getDocumentNumber())
+                //.typeClient(typeClient)
                 .build();
 
         Account account = Account.builder()

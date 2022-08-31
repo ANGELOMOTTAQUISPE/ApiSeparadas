@@ -1,5 +1,6 @@
 package Credit.service.impl;
 
+import Credit.config.WebClientConfig;
 import Credit.model.Client;
 import Credit.model.Credit;
 import Credit.repo.ICreditRepo;
@@ -8,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 @Service
@@ -17,12 +17,19 @@ public class CreditServiceImpl implements ICreditService {
     @Autowired
     private ICreditRepo repo;
 
+
+
     public Mono<Client> findByApiClient(Client client){
         String documentNumber =client.getDocumentNumber();
-        String Uri ="http://localhost:8085/api/client/documentNumber/"+documentNumber;
-        RestTemplate resTemplate= new RestTemplate();
-        Client clien = resTemplate.getForObject(Uri,Client.class);
-        return Mono.just(clien);
+
+        WebClientConfig webconfig = new WebClientConfig();
+        return webconfig.setUriData("http://localhost:8085").flatMap(
+                d -> {
+                    System.out.println("URL :" +d);
+                    Mono<Client> clientMono = webconfig.getWebclient().get().uri("/api/client/documentNumber/"+documentNumber).retrieve().bodyToMono(Client.class);
+                    return clientMono;
+                }
+        );
     }
     public Mono<Credit> register(Credit obj) {
         //Mono<Credit> p = service.register(credit);
@@ -36,13 +43,13 @@ public class CreditServiceImpl implements ICreditService {
                         return count
                                 .flatMap( c->{
                                     //Mono<Long> cant = null;
-                                    logger.info("-- : "+c);
+                                    logger.info("Contamos la lista de creditos: "+c);
                                     if(c>0){
-                                        logger.info("1: "+c);
+                                        logger.info("Posee mas de un credito: "+c);
                                         throw new UserAlreadyPresentException(" El cliente ya tiene un credito: "+c);
                                         //return Mono.just("El cliente ya tiene un credito");
                                     }else{
-                                        logger.info("2: "+c);
+                                        logger.info("No posee credito: "+c);
                                         return repo.save(obj);
                                     }
                                 });

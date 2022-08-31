@@ -1,6 +1,7 @@
 package Account.service.impl;
 
-import Account.dto.CreditServiceList;
+import Account.config.WebClientConfig;
+import Account.dto.AccountMovementdto;
 import Account.exception.ModelNotFoundException;
 import Account.model.*;
 import Account.repo.IAccountRepo;
@@ -9,11 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,43 +23,72 @@ public class AccountServiceImpl  implements IAccountService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private IAccountRepo repo;
-    public Mono<Client> findByApiClient(String documentNumber){
-        String Uri ="http://localhost:8085/api/client/documentNumber/"+documentNumber;
-        RestTemplate resTemplate= new RestTemplate();
-        Client clien = resTemplate.getForObject(Uri,Client.class);
-        return Mono.just(clien);
+    public Mono<Client> findClientByDni(String documentNumber){
+        WebClientConfig webconfig = new WebClientConfig();
+        logger.info("documentNumber: "+ documentNumber );
+        return webconfig.setUriData("http://localhost:8085").flatMap(
+                d -> {
+                    logger.info("URL: "+d );
+                    Mono<Client> clientMono = webconfig.getWebclient().get().uri("/api/client/documentNumber/"+documentNumber).retrieve().bodyToMono(Client.class);
+
+                    return clientMono.flatMap( clientflatmap -> {
+                                logger.info("Id del cliente buscado: "+clientflatmap.getIdClient() );
+                                return Mono.just(clientflatmap);
+                            }
+                            );
+                }
+        );
     }
     public Flux<Credit> findCreditBydocumentnumber(String documentNumber){
-        //String documentNumber =credit.getClient().getDocumentNumber();
-        String Uri ="http://localhost:8087/api/credit/documentNumber/"+documentNumber;
-        RestTemplate resTemplate= new RestTemplate();
-        CreditServiceList credit = resTemplate.getForObject(Uri, CreditServiceList.class);
-        return Flux.fromIterable(credit.getCreditServices());
+        WebClientConfig webconfig = new WebClientConfig();
+        return webconfig.setUriData("http://localhost:8087").flatMapMany(
+                d -> {
+                    logger.info("URL: "+d );
+                    Flux<Credit> clientMono = webconfig.getWebclient().get().uri("/api/credit/documentNumber/"+documentNumber).retrieve().bodyToFlux(Credit.class);
+                    return clientMono;
+                }
+        );
     }
-    public Mono<Movement> registerMovementBydocumentnumber(Movement movement){
-        //String documentNumber =credit.getClient().getDocumentNumber();
-        String Uri ="http://localhost:8088/api/movement/accountmovement";
-        RestTemplate resTemplate= new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Movement> httpEntity = new HttpEntity<>(movement, headers);
-        Movement creditResultAsJson =
-                resTemplate.postForObject(Uri, httpEntity, Movement.class);
-        logger.info("Recibí el id del movimiento registrado " +creditResultAsJson.getIdMovement());
-        return Mono.just(creditResultAsJson);
+    public Mono<Movement> registerMovementBydocumentnumber(AccountMovementdto movement){
+        WebClientConfig webconfigregister = new WebClientConfig();
+
+        return webconfigregister.setUriData("http://localhost:8088").flatMap(
+                d -> {
+                    logger.info("URL: "+d );
+                    Mono<Movement> clientMono = webconfigregister
+                            .getWebclient()
+                            .post()
+                            .uri("/api/movement/accountmovement/")
+                            .accept(MediaType.APPLICATION_JSON)
+                            .body(Mono.just(movement),AccountMovementdto.class)
+                            .retrieve()
+                            .bodyToMono(Movement.class);
+                    return clientMono;
+                }
+        );
     }
     public Mono<Account> register(Account obj, Double ammountmovementInitial) {
         String documentNumber =obj.getClient().getDocumentNumber();
-
-        return findByApiClient(documentNumber)
+        logger.info(" Número de documento del cliente: "+documentNumber);
+        return findClientByDni(documentNumber)
                 .flatMap( cl -> {
                     Fee fee = new Fee();
-                    String AccountType=obj.getAccountType().toString();
+                    logger.info(" Account Type ");
+                    String AccountType=obj.getAccountType();
+                    logger.info(" Profile ");
+                    logger.info(" Profile 2 " + cl.getTypeClient().getProfile());
+                    String profileTypeCLient=cl.getTypeClient().getProfile();
+                    logger.info(" Account Type: "+AccountType);
+                    logger.info(" Profile Type Client   : "+profileTypeCLient);
                     if (AccountType.equals("a")){
                         fee.setMonthlyMovement(5);
                         obj.setFee(fee);
                     } else if (AccountType.equals("cc")) {
-                        fee.setMaintenanceCommission(200.0);
+                        if (profileTypeCLient.equals("PYME")){
+                            fee.setMaintenanceCommission(0.0);
+                        }else{
+                            fee.setMaintenanceCommission(200.0);
+                        }
                         obj.setFee(fee);
                     } else if (AccountType.equals("pf")) {
                         fee.setDate(LocalDateTime.now());
@@ -75,7 +102,6 @@ public class AccountServiceImpl  implements IAccountService {
                     * */
                     logger.info("Entra condicional " +cl.getTypeClient().getClientType());
 
-
                     if(cl.getTypeClient().getClientType().equals("personal")){
                         logger.info("personal");
                         Flux<Account> lista = repo.findByAccountClient(documentNumber, AccountType);
@@ -86,32 +112,30 @@ public class AccountServiceImpl  implements IAccountService {
                                     if(c > 0){
                                         logger.info(" El cliente personal ya tiene una cuenta: "+c);
                                         throw new ModelNotFoundException(" El cliente personal ya tiene una cuenta: "+c);
-                                        //return Mono.just("El cliente ya tiene un credito");
                                     }else{
 
                                         logger.info("El cliente puede registrar la cuenta: "+c);
                                         if (AccountType.equals("a") && cl.getTypeClient().getProfile().equals("VIP")) {
                                             logger.info("El cliente es VIP y registrara una cuenta de ahorros");
-                                        Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
-                                        return countCredit.count()
+                                            Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
+
+                                            return countCredit.count()
                                                 .flatMap( ca -> {
+                                                    logger.info("Cantidad de creditos: "+ca);
                                                     if(ca > 0) {
                                                         if(obj.getMinimammount() <= ammountmovementInitial){
-                                                            Mono<Account> account = repo.save(obj);
                                                             logger.info("El monto minimo es suficiente");
-                                                            account.doOnNext(doAc->{
-                                                                Movement movement = Movement.builder()
+                                                            return repo.save(obj).flatMap(doAc->{
+                                                                logger.info("Datos registrados de Account: ID:"+doAc.getIdAccount()+ " ACCOUNT NUMBER"+doAc.getAccountNumber());
+                                                                AccountMovementdto movement = AccountMovementdto.builder()
                                                                         .movement(ammountmovementInitial)
                                                                         .typeMovement("deposito")
-                                                                        .account(doAc)
+                                                                        .idAccount(doAc.getIdAccount())
+                                                                        .accountNumber(doAc.getAccountNumber())
                                                                         .build();
 
-                                                                registerMovementBydocumentnumber(movement);
-
-                                                            }).subscribe();
-
-                                                            return account;
-
+                                                                return registerMovementBydocumentnumber(movement); //Mono.just(doAc);
+                                                            });
                                                         }else{
                                                             throw new ModelNotFoundException(" Monto mínimo no suficiente: ");
                                                         }
@@ -121,6 +145,7 @@ public class AccountServiceImpl  implements IAccountService {
 
                                                 });
                                         }else {
+                                            logger.info("No es cuenta de ahorro o no es cliente VIP " );
                                             return repo.save(obj);
                                         }
                                     }
@@ -129,10 +154,24 @@ public class AccountServiceImpl  implements IAccountService {
                         if( AccountType.equals("a") || AccountType.equals("pf") ){
                             throw new ModelNotFoundException(" El cliente empresarial ya tiene una cuenta: ");
                         }else{
-                            //logger.info("empresarial: " + obj.getIdCredit() + " - " +  obj.getCreditCardNumber());
+                            if (AccountType.equals("cc") && cl.getTypeClient().getProfile().equals("PYME")) {
+                                logger.info("El cliente empresarial es PYME y registrara una cuenta corriente");
+                                Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
+                                return countCredit.count()
+                                        .flatMap( ca -> {
+                                            logger.info("Cantidad de creditos: "+ca);
+                                            if(ca > 0) {
+                                                logger.info("El cliente cuenta con al menos una tarjeta de crédito: ");
+                                                return repo.save(obj);
+                                            }else {
+                                                throw new ModelNotFoundException(" El cliente Empresarial no tiene tarjeta de crédito: ");
+                                            }
+                                        });
+                            }
                             return repo.save(obj);
                         }
                     }else{
+                        logger.info("Es otro tipo de cliente " );
                         return Mono.just(obj);
                     }
                 })
