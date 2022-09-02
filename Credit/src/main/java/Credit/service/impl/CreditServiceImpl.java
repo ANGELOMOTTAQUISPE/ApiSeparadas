@@ -8,11 +8,14 @@ import Credit.service.ICreditService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 @Service
 public class CreditServiceImpl implements ICreditService {
+    @Value("${my.property.ip}")
+    private String ip;
     private static final Logger logger = LoggerFactory.getLogger(CreditServiceImpl.class);
     @Autowired
     private ICreditRepo repo;
@@ -23,7 +26,7 @@ public class CreditServiceImpl implements ICreditService {
         String documentNumber =client.getDocumentNumber();
 
         WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://192.168.232.130:8085").flatMap(
+        return webconfig.setUriData("http://"+ip+":8085").flatMap(
                 d -> {
                     System.out.println("URL :" +d);
                     Mono<Client> clientMono = webconfig.getWebclient().get().uri("/api/client/documentNumber/"+documentNumber).retrieve().bodyToMono(Client.class);

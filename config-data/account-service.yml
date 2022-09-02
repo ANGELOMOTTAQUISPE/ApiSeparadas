@@ -4,7 +4,7 @@ server:
     include-message: always
 my:
   property:
-    ip: "localhost"
+    ip: "192.168.232.130"
 spring:
   data:
     mongodb:

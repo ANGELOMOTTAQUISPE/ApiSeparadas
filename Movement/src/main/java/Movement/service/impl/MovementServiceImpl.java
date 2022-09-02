@@ -12,6 +12,7 @@ import Movement.service.IMovementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,6 +22,8 @@ import java.util.Calendar;
 
 @Service
 public class MovementServiceImpl implements IMovementService {
+    @Value("${my.property.ip}")
+    private String ip;
     private static final Logger logger = LoggerFactory.getLogger(MovementServiceImpl.class);
     @Autowired
     private IMovementRepo repo;
@@ -28,7 +31,7 @@ public class MovementServiceImpl implements IMovementService {
     private IBanktransferetService serviceBankTransferet;
     public Mono<Credit> findCreditByid(String id){
         WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://192.168.232.130:8087").flatMap(
+        return webconfig.setUriData("http://"+ip+":8087").flatMap(
                 d -> {
                     logger.info("URL: "+d );
                     Mono<Credit> clientMono = webconfig.getWebclient().get().uri("/api/credit/"+id).retrieve().bodyToMono(Credit.class);
@@ -39,7 +42,7 @@ public class MovementServiceImpl implements IMovementService {
     }
     public Mono<Account> findAccountByid(String id){
         WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://192.168.232.130:8086").flatMap(
+        return webconfig.setUriData("http://"+ip+":8086").flatMap(
                 d -> {
                     logger.info("URL: "+d );
                     Mono<Account> clientMono = webconfig.getWebclient().get().uri("/api/account/"+id).retrieve().bodyToMono(Account.class);
