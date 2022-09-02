@@ -53,7 +53,7 @@ public class ClientController {
         logger.info("Inicio metodo delete() de ClientController");
         return service.delete(id).map(r->ResponseEntity.ok().<Void>build()).defaultIfEmpty(ResponseEntity.notFound().build());
     }
-    @CircuitBreaker(name="client", fallbackMethod = "fallBackGetCreditbyDocumentNumber")
+    @CircuitBreaker(name="client", fallbackMethod = "fallBackGetClientbyDocumentNumber")
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<Mono<Client>> clientbydocumentNumber(@PathVariable("documentNumber") String documentNumber){
         logger.info("Inicio metodo clientbydocumentNumber() de ClientController");
@@ -84,7 +84,7 @@ public class ClientController {
         }
         return new ResponseEntity<Mono<Client>>(p, HttpStatus.OK);
     }
-    public ResponseEntity<Mono<Client>> fallBackGetCreditbyDocumentNumber(@PathVariable("documentNumber") String documentNumber, RuntimeException runtimeException){
-        return new ResponseEntity(("El número de documento "+documentNumber+" no existe"),HttpStatus.OK);
+    public ResponseEntity<Mono<Client>> fallBackGetClientbyDocumentNumber(String documentNumber, RuntimeException runtimeException){
+        return new ResponseEntity("Microservicio Client no funciona",HttpStatus.OK);
     }
 }

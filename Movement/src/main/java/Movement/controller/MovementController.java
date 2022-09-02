@@ -8,6 +8,7 @@ import Movement.model.BankTransferet;
 import Movement.model.Credit;
 import Movement.model.Movement;
 import Movement.service.IMovementService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class MovementController {
         }
         return new ResponseEntity<Flux<Movement>>(lista, HttpStatus.OK);
     }
+    @CircuitBreaker(name="movement", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/{id}")
     public ResponseEntity<Mono<Movement>> listId(@PathVariable("id") String id){
         logger.info("Inicio metodo listId() de requestcontroller");
@@ -165,6 +167,7 @@ public class MovementController {
         }
         return new ResponseEntity<Mono<Movement>>(p, HttpStatus.OK);
     }
+    @CircuitBreaker(name="movement", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/listMovementAccount/{accountNumber}")
     public ResponseEntity<Flux<Movement>> listmovementByAccount(@PathVariable("accountNumber") String accountNumber){
         logger.info("Inicio metodo listmovementByAccount() de MovementController");
@@ -172,6 +175,7 @@ public class MovementController {
 
         return new ResponseEntity<Flux<Movement>>(movement, HttpStatus.OK);
     }
+    @CircuitBreaker(name="movement", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/listMovementCredit/{creditNumber}")
     public ResponseEntity<Flux<Movement>> listmovementByCredit(@PathVariable("creditNumber") String creditNumber){
         logger.info("Inicio metodo listmovementByCredit() de MovementController");
@@ -179,6 +183,7 @@ public class MovementController {
 
         return new ResponseEntity<Flux<Movement>>(movement, HttpStatus.OK);
     }
+    @CircuitBreaker(name="movement", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/listmovementsbydates/{iniDate}/{finDate}/{accountNumber}")
     public ResponseEntity<Flux<Movement>> listmovementByDates(@PathVariable("iniDate") String iniDate,@PathVariable("finDate") String finDate,@PathVariable("accountNumber") String accountNumber){
         logger.info("Inicio metodo listmovementByDates() de MovementController");
@@ -187,5 +192,7 @@ public class MovementController {
 
         return new ResponseEntity<Flux<Movement>>(movement, HttpStatus.OK);
     }
-
+    public ResponseEntity<Mono<Movement>> fallBackGetCredit(String documentNumber, RuntimeException runtimeException){
+        return new ResponseEntity("Microservicio Movement no funciona",HttpStatus.OK);
+    }
 }

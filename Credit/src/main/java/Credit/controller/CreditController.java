@@ -4,6 +4,7 @@ import Credit.dto.Creditdto;
 import Credit.model.Client;
 import Credit.model.Credit;
 import Credit.service.ICreditService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ public class CreditController {
         }
         return new ResponseEntity<Mono<Credit>>(p, HttpStatus.OK);
     }
-
+    @CircuitBreaker(name="credit", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<Flux<Credit>> listCreditByDocumentNumberClient(@PathVariable("documentNumber") String documentNumber){
         logger.info("Inicio metodo listCreditByDocumentNumberClient() de CreditController");
@@ -83,6 +84,7 @@ public class CreditController {
 
         return new ResponseEntity<Flux<Credit>>(credit, HttpStatus.OK);
     }
+    @CircuitBreaker(name="credit", fallbackMethod = "fallBackGetCredit")
     @GetMapping("/{id}")
     public ResponseEntity<Mono<Credit>> listCreditById(@PathVariable("id") String id){
         logger.info("Inicio metodo listCreditById() de CreditController");
@@ -90,4 +92,8 @@ public class CreditController {
         logger.info("FIN metodo listCreditById() de CreditController");
         return new ResponseEntity<Mono<Credit>>(credit, HttpStatus.OK);
     }
+    public ResponseEntity<Mono<Credit>> fallBackGetCredit(String documentNumber, RuntimeException runtimeException){
+        return new ResponseEntity("Microservicio Credit no funciona",HttpStatus.OK);
+    }
+
 }

@@ -81,15 +81,16 @@ public class AccountController {
         }
         return new ResponseEntity<>(p, HttpStatus.OK);
     }
-    @CircuitBreaker(name="account", fallbackMethod = "fallBackGetCreditbyId")
+
     @GetMapping("/{id}")
+    @CircuitBreaker(name="account", fallbackMethod = "fallBackGetCreditbyId")
     public ResponseEntity<Mono<Account>> listCreditById(@PathVariable("id") String id){
         logger.info("Inicio metodo listCreditById() de AccountController");
         Mono<Account> account = service.listofId(id);
         logger.info("FIN metodo listCreditById() de AccountController");
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
-    public ResponseEntity<Mono<Account>> fallBackGetCreditbyId(@PathVariable("id") String id, RuntimeException runtimeException){
-        return new ResponseEntity(("El credito "+id+" no existe"),HttpStatus.OK);
+    public ResponseEntity<Mono<String>> fallBackGetCreditbyId(@PathVariable("id") String id, RuntimeException e){
+        return new ResponseEntity("Microservicio Account no funciona",HttpStatus.OK);
     }
 }
