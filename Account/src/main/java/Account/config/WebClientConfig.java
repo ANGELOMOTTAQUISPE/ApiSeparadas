@@ -30,17 +30,4 @@ public  class WebClientConfig {
                 }
         );
     }
-    public Mono<String> setUriData2(String getUrl){
-        logger.info("Inicio 2 Set uri data Mono " + getUrl );
-        return Mono.just(getUrl).flatMap(
-                u ->{
-                    if(!Url.equals(getUrl)){
-                        logger.info("Ingreso y le dio el valor a la URL: "+Url );
-                        this.webclient =  WebClient.builder().baseUrl(u).build();
-                        setUrl(getUrl);
-                    }
-                    return Mono.just(u);
-                }
-        );
-    }
 }

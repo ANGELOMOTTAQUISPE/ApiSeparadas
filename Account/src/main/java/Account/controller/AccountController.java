@@ -4,6 +4,7 @@ import Account.dto.Accountdto;
 import Account.model.Account;
 import Account.model.Client;
 import Account.service.IAccountService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +32,10 @@ public class AccountController {
         }finally {
             logger.info( "Fin metodo list() de AccountController");
         }
-        return new ResponseEntity<Flux<Account>>(lista, HttpStatus.OK);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
     @PostMapping
+    @CircuitBreaker(name="client", fallbackMethod = "fallBackPostClient")
     public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
         Mono<Account> p = null;
@@ -59,7 +61,7 @@ public class AccountController {
         }finally {
             logger.info( "Fin metodo register() de AccountController");
         }
-        return new ResponseEntity<Mono<Account>>(p, HttpStatus.CREATED);
+        return new ResponseEntity<>(p, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id) {
@@ -78,13 +80,20 @@ public class AccountController {
         }finally {
             logger.info( "Fin metodo update() de AccountController");
         }
-        return new ResponseEntity<Mono<Account>>(p, HttpStatus.OK);
+        return new ResponseEntity<>(p, HttpStatus.OK);
     }
     @GetMapping("/{id}")
+    @CircuitBreaker(name="client", fallbackMethod = "fallBackPostClient")
     public ResponseEntity<Mono<Account>> listCreditById(@PathVariable("id") String id){
         logger.info("Inicio metodo listCreditById() de AccountController");
         Mono<Account> account = service.listofId(id);
         logger.info("FIN metodo listCreditById() de AccountController");
-        return new ResponseEntity<Mono<Account>>(account, HttpStatus.OK);
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+    public ResponseEntity<Mono<Account>> fallBackPostClient(@RequestBody Accountdto checkingdto, RuntimeException runtimeException){
+        return new ResponseEntity(Mono.just("Microservicio no diponibles"),HttpStatus.OK);
+    }
+    public ResponseEntity<Mono<Account>> fallBackGetCreditbyId(@PathVariable("id") String id, RuntimeException runtimeException){
+        return new ResponseEntity(Mono.just("Credito no diponibles"),HttpStatus.OK);
     }
 }
