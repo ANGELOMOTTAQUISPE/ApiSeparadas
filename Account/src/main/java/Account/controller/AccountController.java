@@ -35,7 +35,6 @@ public class AccountController {
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
     @PostMapping
-    @CircuitBreaker(name="client", fallbackMethod = "fallBackPostClient")
     public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
         Mono<Account> p = null;
@@ -82,18 +81,15 @@ public class AccountController {
         }
         return new ResponseEntity<>(p, HttpStatus.OK);
     }
+    @CircuitBreaker(name="account", fallbackMethod = "fallBackGetCreditbyId")
     @GetMapping("/{id}")
-    @CircuitBreaker(name="client", fallbackMethod = "fallBackPostClient")
     public ResponseEntity<Mono<Account>> listCreditById(@PathVariable("id") String id){
         logger.info("Inicio metodo listCreditById() de AccountController");
         Mono<Account> account = service.listofId(id);
         logger.info("FIN metodo listCreditById() de AccountController");
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
-    public ResponseEntity<Mono<Account>> fallBackPostClient(@RequestBody Accountdto checkingdto, RuntimeException runtimeException){
-        return new ResponseEntity(Mono.just("Microservicio no diponibles"),HttpStatus.OK);
-    }
     public ResponseEntity<Mono<Account>> fallBackGetCreditbyId(@PathVariable("id") String id, RuntimeException runtimeException){
-        return new ResponseEntity(Mono.just("Credito no diponibles"),HttpStatus.OK);
+        return new ResponseEntity(("El credito "+id+" no existe"),HttpStatus.OK);
     }
 }

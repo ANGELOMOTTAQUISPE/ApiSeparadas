@@ -2,6 +2,7 @@ package Client.controller;
 
 import Client.model.Client;
 import Client.service.IClientService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,7 @@ public class ClientController {
         logger.info("Inicio metodo delete() de ClientController");
         return service.delete(id).map(r->ResponseEntity.ok().<Void>build()).defaultIfEmpty(ResponseEntity.notFound().build());
     }
+    @CircuitBreaker(name="client", fallbackMethod = "fallBackGetCreditbyDocumentNumber")
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<Mono<Client>> clientbydocumentNumber(@PathVariable("documentNumber") String documentNumber){
         logger.info("Inicio metodo clientbydocumentNumber() de ClientController");
@@ -81,5 +83,8 @@ public class ClientController {
             logger.info( "Fin metodo clientbydocumentNumber() de ClientController");
         }
         return new ResponseEntity<Mono<Client>>(p, HttpStatus.OK);
+    }
+    public ResponseEntity<Mono<Client>> fallBackGetCreditbyDocumentNumber(@PathVariable("documentNumber") String documentNumber, RuntimeException runtimeException){
+        return new ResponseEntity(("El número de documento "+documentNumber+" no existe"),HttpStatus.OK);
     }
 }

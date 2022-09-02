@@ -25,7 +25,7 @@ management:
 resilience4j:
   circuitbreaker:
     instances:
-      client:
+      account:
         registerHealthIndicator: true
         eventConsumerBufferSize: 10
         slidingWindowType: COUNT_BASED
