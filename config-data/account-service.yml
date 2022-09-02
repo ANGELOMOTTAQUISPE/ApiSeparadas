@@ -1,5 +1,7 @@
 server:
   port: 8086
+  error:
+    include-message: always
 
 spring:
   data:
@@ -9,3 +11,4 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8099/eureka
+

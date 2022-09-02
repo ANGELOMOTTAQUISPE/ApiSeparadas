@@ -6,7 +6,6 @@ import Account.exception.ModelNotFoundException;
 import Account.model.*;
 import Account.repo.IAccountRepo;
 import Account.service.IAccountService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import java.time.LocalDateTime;
 @Service
 public class AccountServiceImpl  implements IAccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private IAccountRepo repo;
     public Mono<Client> findClientByDni(String documentNumber){
@@ -78,6 +76,15 @@ public class AccountServiceImpl  implements IAccountService {
                     logger.info(" Profile ");
                     logger.info(" Profile 2 " + cl.getTypeClient().getProfile());
                     String profileTypeCLient=cl.getTypeClient().getProfile();
+
+                    if(profileTypeCLient==null){
+                        logger.info(" Profile null ");
+                        cl.getTypeClient().setProfile("");
+                    }
+                    else{
+                        logger.info(" Profile not null ");
+                        profileTypeCLient=cl.getTypeClient().getProfile();
+                    }
                     logger.info(" Account Type: "+AccountType);
                     logger.info(" Profile Type Client   : "+profileTypeCLient);
                     if (AccountType.equals("a")){
@@ -109,10 +116,10 @@ public class AccountServiceImpl  implements IAccountService {
                         Mono<Long> count = lista.count();
                         return count
                                 .flatMap( c->{
-                                    logger.info("-- : "+c);
+
                                     if(c > 0){
                                         logger.info(" El cliente personal ya tiene una cuenta: "+c);
-                                        throw new ModelNotFoundException(" El cliente personal ya tiene una cuenta: "+c);
+                                        throw new ModelNotFoundException(" El cliente personal ya tiene una cuenta: ");
                                     }else{
 
                                         logger.info("El cliente puede registrar la cuenta: "+c);
