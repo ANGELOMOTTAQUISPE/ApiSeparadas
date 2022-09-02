@@ -88,8 +88,6 @@ public class MovementServiceImpl implements IMovementService {
     }
 
 
-
-
     /*
     * Registros de Movimientos de  credito:
     *  "typeMovement": "pago" -> para realizar el pago de la tarjeta de credito
@@ -204,7 +202,7 @@ public class MovementServiceImpl implements IMovementService {
         });
     }
     /*
-    * Numerocuentasource, idcuentasource,Numerocuentadestino, idcuentadestino,monto,tipomovimiento
+    * Metodo utilizado para registrar las transferencias bancarias, para registrar cada movimiento
     *
     * */
     public Mono<BankTransferet> registerTransferet(BankTransferet obj) {
@@ -261,8 +259,6 @@ public class MovementServiceImpl implements IMovementService {
                 });
 
     }
-
-
 
 
     public Mono<Movement> modify(Movement obj) {

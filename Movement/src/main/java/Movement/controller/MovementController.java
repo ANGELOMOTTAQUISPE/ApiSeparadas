@@ -107,8 +107,8 @@ public class MovementController {
         return new ResponseEntity<Mono<Movement>>(p, HttpStatus.CREATED);
     }
     @PostMapping("/transferetmovement")
-    public ResponseEntity<Mono<BankTransferet>> registercreditmovement(@RequestBody BankTransferetdto transferetmovement){
-        logger.info("Inicio metodo register() de MovementController");
+    public ResponseEntity<Mono<BankTransferet>> registertransfermovement(@RequestBody BankTransferetdto transferetmovement){
+        logger.info("Inicio metodo registertransfermovement() de MovementController");
         Mono<BankTransferet> p = Mono.empty();
         Account accountSource = Account.builder()
                 .idAccount(transferetmovement.getIdAccountasource())
