@@ -1,4 +1,5 @@
-package Account.model;
+package Movement.model;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,21 +8,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-@Document("movement")
+@Document("banktransfert")
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Movement {
+public class BankTransferet {
     @Id
-    private String idMovement;
-    private Double balance;
-    private Double movement;
-    private String typeMovement;
-    private Account account;
-    private Credit credit;
-    private LocalDateTime movementDate ;
-    private Double commission;
+    private String idTransfert;
+    private Movement sourceAccount;
+    private Movement destinationAccount;
 }

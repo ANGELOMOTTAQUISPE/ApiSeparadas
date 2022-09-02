@@ -37,14 +37,10 @@ public class AccountController {
     public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
         Mono<Account> p = null;
-        /*TypeClient typeClient = TypeClient.builder()
-                .clientType(checkingdto.)
-                .profile()
-                .build();*/
+
         Client client = Client.builder()
                 .idClient(checkingdto.getIdClient())
                 .documentNumber(checkingdto.getDocumentNumber())
-                //.typeClient(typeClient)
                 .build();
 
         Account account = Account.builder()
@@ -83,5 +79,12 @@ public class AccountController {
             logger.info( "Fin metodo update() de AccountController");
         }
         return new ResponseEntity<Mono<Account>>(p, HttpStatus.OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Mono<Account>> listCreditById(@PathVariable("id") String id){
+        logger.info("Inicio metodo listCreditById() de AccountController");
+        Mono<Account> account = service.listofId(id);
+        logger.info("FIN metodo listCreditById() de AccountController");
+        return new ResponseEntity<Mono<Account>>(account, HttpStatus.OK);
     }
 }

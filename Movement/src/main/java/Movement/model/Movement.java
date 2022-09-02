@@ -24,4 +24,5 @@ public class Movement {
     private Account account;
     private Credit credit;
     private LocalDateTime movementDate;
+    private Double commission;
 }

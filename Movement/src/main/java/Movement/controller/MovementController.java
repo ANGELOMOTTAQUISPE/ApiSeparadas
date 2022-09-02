@@ -1,8 +1,10 @@
 package Movement.controller;
 
 import Movement.dto.AccountMovementdto;
+import Movement.dto.BankTransferetdto;
 import Movement.dto.CreditMovementdto;
 import Movement.model.Account;
+import Movement.model.BankTransferet;
 import Movement.model.Credit;
 import Movement.model.Movement;
 import Movement.service.IMovementService;
@@ -66,6 +68,7 @@ public class MovementController {
                 .typeMovement(accountmovement.getTypeMovement())
                 .account(account)
                 .movementDate(LocalDateTime.now())
+
                 .build();
         try {
             p = service.registerAccount(movement);
@@ -103,6 +106,45 @@ public class MovementController {
         }
         return new ResponseEntity<Mono<Movement>>(p, HttpStatus.CREATED);
     }
+    @PostMapping("/transferetmovement")
+    public ResponseEntity<Mono<BankTransferet>> registercreditmovement(@RequestBody BankTransferetdto transferetmovement){
+        logger.info("Inicio metodo register() de MovementController");
+        Mono<BankTransferet> p = Mono.empty();
+        Account accountSource = Account.builder()
+                .idAccount(transferetmovement.getIdAccountasource())
+                .accountNumber(transferetmovement.getNumberAccountSource())
+                .build();
+        Movement movementSource = Movement.builder()
+                .movement(transferetmovement.getAmount())
+                .typeMovement("retirotransferencia")
+                .account(accountSource)
+                .movementDate(LocalDateTime.now())
+                .build();
+        Account accountDestination = Account.builder()
+                .idAccount(transferetmovement.getIdAccountaDestination())
+                .accountNumber(transferetmovement.getNumberAccountdestination())
+                .build();
+        Movement movementDestination = Movement.builder()
+                .movement(transferetmovement.getAmount())
+                .typeMovement("depositotransferencia")
+                .account(accountDestination)
+                .movementDate(LocalDateTime.now())
+                .build();
+        BankTransferet transferet = BankTransferet.builder()
+                .sourceAccount(movementSource)
+                .destinationAccount(movementDestination)
+                .build();
+        try {
+            p = service.registerTransferet(transferet);
+
+        } catch (Exception e) {
+            logger.info("Ocurrio un error " + e.getMessage());
+
+        }finally {
+            logger.info( "Fin metodo register() de MovementController");
+        }
+        return new ResponseEntity<Mono<BankTransferet>>(p, HttpStatus.CREATED);
+    }
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id) {
         logger.info("Inicio metodo delete() de MovementController");
@@ -137,4 +179,13 @@ public class MovementController {
 
         return new ResponseEntity<Flux<Movement>>(movement, HttpStatus.OK);
     }
+    @GetMapping("/listmovementsbydates/{iniDate}/{finDate}/{accountNumber}")
+    public ResponseEntity<Flux<Movement>> listmovementByDates(@PathVariable("iniDate") String iniDate,@PathVariable("finDate") String finDate,@PathVariable("accountNumber") String accountNumber){
+        logger.info("Inicio metodo listmovementByDates() de MovementController");
+
+        Flux<Movement> movement = service.listmovementByDate(iniDate,finDate,accountNumber);
+
+        return new ResponseEntity<Flux<Movement>>(movement, HttpStatus.OK);
+    }
+
 }

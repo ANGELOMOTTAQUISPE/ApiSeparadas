@@ -89,6 +89,7 @@ public class AccountServiceImpl  implements IAccountService {
                         }else{
                             fee.setMaintenanceCommission(200.0);
                         }
+                        fee.setMonthlyMovement(3);
                         obj.setFee(fee);
                     } else if (AccountType.equals("pf")) {
                         fee.setDate(LocalDateTime.now());
