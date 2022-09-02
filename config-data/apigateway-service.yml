@@ -12,19 +12,19 @@ spring:
           enabled: true
       routes:
         - id: CREDIT-SERVICE
-          uri: lb://CREDIT-SERVICE
+          uri: http://192.168.232.130:8087
           predicates:
             - Path=/api/credit/**
         - id: MOVEMENT-SERVICE
-          uri: lb://MOVEMENT-SERVICE
+          uri: http://192.168.232.130:8088
           predicates:
             - Path=/api/movement/**
         - id: CLIENT-SERVICE
-          uri: lb://CLIENT-SERVICE
+          uri: http://192.168.232.130:8085
           predicates:
             - Path=/api/client/**
         - id: ACCOUNT-SERVICE
-          uri: lb://ACCOUNT-SERVICE
+          uri: http://192.168.232.130:8086
           predicates:
             - Path=/api/account/**
 eureka:
