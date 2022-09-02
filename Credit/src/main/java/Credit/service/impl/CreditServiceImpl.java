@@ -23,7 +23,7 @@ public class CreditServiceImpl implements ICreditService {
         String documentNumber =client.getDocumentNumber();
 
         WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://localhost:8085").flatMap(
+        return webconfig.setUriData("http://192.168.232.130:8085").flatMap(
                 d -> {
                     System.out.println("URL :" +d);
                     Mono<Client> clientMono = webconfig.getWebclient().get().uri("/api/client/documentNumber/"+documentNumber).retrieve().bodyToMono(Client.class);

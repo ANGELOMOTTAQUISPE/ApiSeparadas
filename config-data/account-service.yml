@@ -2,7 +2,9 @@ server:
   port: 8086
   error:
     include-message: always
-
+my:
+  property:
+    ip: "localhost"
 spring:
   data:
     mongodb:
@@ -10,7 +12,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8099/eureka
+      defaultZone: http://192.168.232.130:8099/eureka
 management:
   health:
     circuitbreakers:

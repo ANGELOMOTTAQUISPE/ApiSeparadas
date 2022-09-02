@@ -9,6 +9,7 @@ import Account.service.IAccountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -19,12 +20,14 @@ import java.time.LocalDateTime;
 @Service
 public class AccountServiceImpl  implements IAccountService {
     private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
+    @Value("${my.property.ip}")
+    private String ip;
     @Autowired
     private IAccountRepo repo;
     public Mono<Client> findClientByDni(String documentNumber){
         WebClientConfig webconfig = new WebClientConfig();
         logger.info("documentNumber: "+ documentNumber );
-        return webconfig.setUriData("http://localhost:8085").flatMap(
+        return webconfig.setUriData("http://"+ip+":8085").flatMap(
                 d -> {
                     logger.info("URL: "+d );
                     Mono<Client> clientMono = webconfig.getWebclient().get().uri("/api/client/documentNumber/"+documentNumber).retrieve().bodyToMono(Client.class);
@@ -39,7 +42,7 @@ public class AccountServiceImpl  implements IAccountService {
     }
     public Flux<Credit> findCreditBydocumentnumber(String documentNumber){
         WebClientConfig webconfig = new WebClientConfig();
-        return webconfig.setUriData("http://localhost:8087").flatMapMany(
+        return webconfig.setUriData("http://"+ip+":8087").flatMapMany(
                 d -> {
                     logger.info("URL: "+d );
                     Flux<Credit> clientMono = webconfig.getWebclient().get().uri("/api/credit/documentNumber/"+documentNumber).retrieve().bodyToFlux(Credit.class);
@@ -50,7 +53,7 @@ public class AccountServiceImpl  implements IAccountService {
     public Mono<Movement> registerMovementBydocumentnumber(AccountMovementdto movement){
         WebClientConfig webconfigregister = new WebClientConfig();
 
-        return webconfigregister.setUriData("http://localhost:8088").flatMap(
+        return webconfigregister.setUriData("http://"+ip+":8088").flatMap(
                 d -> {
                     logger.info("URL: "+d );
                     Mono<Movement> clientMono = webconfigregister
