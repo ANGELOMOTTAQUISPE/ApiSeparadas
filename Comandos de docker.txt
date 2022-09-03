@@ -1,0 +1,46 @@
+
+docker run --name microservicio-discoverserver-app -p 8099:8099 microservicio-discoverserver:latest -d
+docker build -t angelomq/microservicioconfigserver:1.0
+docker build -t angelomq/microservicio-client:1.0
+docker images
+docker run --name microservicio-client-app -p 8085:8085 microservicio-client:latest 
+docker ps -a
+
+docker build -t "microservicio-account" .
+docker images
+docker run --name microservicio-account-app -p 8086:8086 microservicio-account:latest 
+docker ps -a
+
+docker build -t "microservicio-credit" .
+docker images
+docker run --name microservicio-credit-app -p 8087:8087 microservicio-credit:latest 
+docker ps -a
+
+docker build -t "microservicio-movement" .
+docker images
+docker run --name microservicio-movement-app -p 8088:8088 microservicio-movement:latest 
+docker ps -a
+
+docker build -t "microservicio-apigateway" .
+docker images
+docker run --name microservicio-apigateway-app -p 8089:8089 microservicio-apigateway:latest 
+docker ps -a
+
+
+docker tag micrservicio-configserver:latest angelomq/microservicioconfigserver:v1
+docker push angelomq/microservicioconfigserver:v1
+
+docker tag microservicio-discoverserver:latest angelomq/microservicio-discoverserver:v1
+docker push angelomq/microservicio-discoverserver:v1
+
+docker tag microservicio-client:latest  angelomq/microservicioclient:v1
+docker push angelomq/microservicioclient:v1
+
+docker tag microservicio-account:latest  angelomq/microservicioaccount:v1
+docker push angelomq/microservicioaccount:v1
+
+docker tag microservicio-movement:latest angelomq/microserviciomovement:v1
+docker push angelomq/microserviciomovement:v1
+
+docker tag microservicio-apigateway:latest angelomq/microservicioapigateway:v1
+docker push angelomq/microservicioapigateway:v1
