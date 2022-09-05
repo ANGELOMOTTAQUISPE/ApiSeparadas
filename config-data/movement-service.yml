@@ -5,6 +5,7 @@ server:
 my:
   property:
     ip: "192.168.232.130"
+    ipconfigServer: "192.168.232.130:9990"
 spring:
   data:
     mongodb:
