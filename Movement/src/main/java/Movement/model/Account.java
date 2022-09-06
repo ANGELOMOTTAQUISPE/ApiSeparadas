@@ -21,6 +21,8 @@ public class Account {
     private String idAccount;
     private String accountNumber;
     private String accountType;
+    private String debitCardNumber;
+    private Integer priority;
     private Fee fee;
     private Client client;
     private List<String> headline;

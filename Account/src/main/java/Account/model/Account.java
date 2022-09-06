@@ -37,7 +37,7 @@ public class Account {
     private String accountNumber;
     private String accountType;
     private String debitCardNumber;
-    private String priority;
+    private Integer priority;
     private Double minimammount;
     private Fee fee;
     private Client client;
