@@ -16,11 +16,28 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+/*
+* Esta es el modelo de las cuentas ()
+* @autor Angelo Motta
+* */
 public class Account {
+    /*
+    * Se crea una entidad Account con los parametros:
+    * @param idAccount idcuenta
+    * @param accountNumber
+    * @param accountType
+    * @param minimammount
+    * @param fee
+    * @param client
+    * @param headline
+    * @param authorizedSignatures
+    * */
     @Id
     private String idAccount;
     private String accountNumber;
     private String accountType;
+    private String debitCardNumber;
+    private String priority;
     private Double minimammount;
     private Fee fee;
     private Client client;

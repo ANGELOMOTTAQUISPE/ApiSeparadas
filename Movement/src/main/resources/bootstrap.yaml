@@ -4,7 +4,7 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: ${my.property.ipconfigServer}
+      uri: http://192.168.232.130:9990
   security:
     user:
       name: root

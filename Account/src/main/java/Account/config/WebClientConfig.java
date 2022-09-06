@@ -25,7 +25,7 @@ public  class WebClientConfig {
                         logger.info("Ingreso y le dio el valor a la URL: "+Url );
                         this.webclient =  WebClient.builder().baseUrl(u).build();
                         setUrl(getUrl);
-                    }
+                    } http://localhost:8085
                     return Mono.just(u);
                 }
         );

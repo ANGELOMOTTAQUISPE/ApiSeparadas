@@ -16,9 +16,9 @@ docker images
 docker run --name microservicio-credit-app -p 8087:8087 microservicio-credit:latest 
 docker ps -a
 
-docker build -t "microservicio-movement" .
+docker build -t angelomq/microserviciomovement:v1 .
 docker images
-docker run --name microservicio-movement-app -p 8088:8088 microservicio-movement:latest 
+docker run --name microservicio-movement-app -p 8088:8088 a5729e7991bd
 docker ps -a
 
 docker build -t "microservicio-apigateway" .
