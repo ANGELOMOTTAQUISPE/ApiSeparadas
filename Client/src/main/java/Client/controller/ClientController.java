@@ -72,7 +72,7 @@ public class ClientController {
     @PutMapping
     public ResponseEntity<Mono<Client>> update(@RequestBody Client client){
         logger.info("Inicio metodo update() de ClientController");
-        Mono<Client> p = null;
+        Mono<Client> p = Mono.empty();
         try {
             p = service.modify(client);
 
