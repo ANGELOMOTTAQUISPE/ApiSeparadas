@@ -57,7 +57,7 @@ public class ClientController {
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<Mono<Client>> clientbydocumentNumber(@PathVariable("documentNumber") String documentNumber){
         logger.info("Inicio metodo clientbydocumentNumber() de ClientController");
-        Mono<Client> lista = null;
+        Mono<Client> lista = Mono.empty();
         try {
             lista = service.clientbydocumentNumber(documentNumber);
 
