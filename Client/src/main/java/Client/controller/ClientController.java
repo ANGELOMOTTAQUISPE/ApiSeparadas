@@ -21,7 +21,7 @@ public class ClientController {
     @GetMapping
     public ResponseEntity<Flux<Client>> list(){
         logger.info("Inicio metodo list() de ClientController");
-        Flux<Client> lista = null;
+        Flux<Client> lista = Flux.empty();
         try {
             lista = service.list();
 
