@@ -62,8 +62,9 @@ public class MovementController {
         logger.info("Inicio metodo register() de MovementController");
         Mono<Movement> p = Mono.empty();
         Account account = Account.builder()
-                .idAccount(accountmovement.getIdAccount())
-                .accountNumber(accountmovement.getAccountNumber())
+                .idAccount( (accountmovement.getIdAccount() != null ? accountmovement.getIdAccount() : "") )
+                .accountNumber( (accountmovement.getAccountNumber() != null ? accountmovement.getAccountNumber() : "") )
+                .debitCardNumber(accountmovement.getDebitcardnumber())
                 .build();
         Movement movement = Movement.builder()
                 .movement(accountmovement.getMovement())

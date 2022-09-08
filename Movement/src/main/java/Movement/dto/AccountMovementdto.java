@@ -16,5 +16,6 @@ public class AccountMovementdto {
     private String typeMovement;
     private String idAccount;
     private String accountNumber;
+    private String debitcardnumber;
     private LocalDateTime movementDate ;
 }

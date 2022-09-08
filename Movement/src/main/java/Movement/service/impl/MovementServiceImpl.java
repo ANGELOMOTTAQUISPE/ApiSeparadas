@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.stream.Stream;
 
 @Service
 public class MovementServiceImpl implements IMovementService {
@@ -33,9 +34,9 @@ public class MovementServiceImpl implements IMovementService {
         WebClientConfig webconfig = new WebClientConfig();
         return webconfig.setUriData("http://"+ip+":8087").flatMap(
                 d -> {
-                    logger.info("URL: "+d );
+                    logger.info(" findCreditByid - INICIO URL: "+d );
                     Mono<Credit> clientMono = webconfig.getWebclient().get().uri("/api/credit/"+id).retrieve().bodyToMono(Credit.class);
-                    logger.info("FIN URL: "+d );
+                    logger.info("FIN URL: "+d +"/api/credit/");
                     return clientMono;
                 }
         );
@@ -44,10 +45,21 @@ public class MovementServiceImpl implements IMovementService {
         WebClientConfig webconfig = new WebClientConfig();
         return webconfig.setUriData("http://"+ip+":8086").flatMap(
                 d -> {
-                    logger.info("URL: "+d );
+                    logger.info("findAccountByid- INICIO URL: "+d );
                     Mono<Account> clientMono = webconfig.getWebclient().get().uri("/api/account/"+id).retrieve().bodyToMono(Account.class);
-                    logger.info("FIN URL: "+d );
+                    logger.info("FIN URL: "+d+"/api/account/" );
                     return clientMono;
+                }
+        );
+    }
+    public Flux<Account> listAccountByDebitCardNumber(String DebitCardNumber){
+        WebClientConfig webconfig = new WebClientConfig();
+        return webconfig.setUriData("http://"+ip+":8086").flatMapMany(
+                d -> {
+                    logger.info("listAccountByDebitCardNumber -INICIO URL: "+d );
+                    Flux<Account> accountFlux = webconfig.getWebclient().get().uri("api/account/debitcardnumber/"+DebitCardNumber).retrieve().bodyToFlux(Account.class);
+                    logger.info("FIN URL: "+d + "api/account/debitcardnumber/");
+                    return accountFlux;
                 }
         );
     }
@@ -61,21 +73,88 @@ public class MovementServiceImpl implements IMovementService {
      * */
     public Mono<Movement> registerAccount(Movement obj) {
         String typeMovement = "account";
-        String accountId= obj.getAccount().getIdAccount();
 
-        Mono<Movement> listmovementAccount = repo.findlastMovementbyAccount(obj.getAccount().getAccountNumber());
-        logger.info("Lista de movimientos por cuenta: "+listmovementAccount);
+        if (obj.getTypeMovement().equals("retiro") || obj.getTypeMovement().equals("pago") || obj.getTypeMovement().equals("retirotransferencia") ){
 
+            Flux<Account> listaccountbyDebitCard = listAccountByDebitCardNumber(obj.getAccount().getDebitCardNumber());
+
+            Flux<Movement> listmovement = listaccountbyDebitCard.flatMap(
+                    p -> {
+
+                        logger.info("cuentas de debito");
+                        String accountId= p.getIdAccount();
+                        Boolean isRegistro = false;
+                        //balance de cuenta, id cuenta, idmovimiento
+                        return findAndSaveMovements( p.getAccountNumber(), obj,  typeMovement,  accountId, isRegistro);
+                    }
+            );
+
+            return listmovement.collectList().flatMap( cl -> {
+
+                logger.info("----- Movimientos para procesar" + cl.toString());
+
+                Mono<Movement> mbObj = Mono.just(cl.stream()
+                        .filter(mv ->  !mv.getIdMovement().equals("") )
+                        .findFirst()
+                        .orElse( new Movement() ));
+
+                return mbObj.flatMap( mv ->{
+                    logger.info("Movimiento con balnace encontrado: " + mv.toString() );
+
+                    String accountId= mv.getAccount().getIdAccount();
+                    Boolean isRegistro = true;
+                    obj.setIdMovement(null);
+                    Account account = Account.builder()
+                            .idAccount( (mv.getAccount().getIdAccount() != null ? mv.getAccount().getIdAccount() : "") )
+                            .accountNumber( (mv.getAccount().getAccountNumber() != null ? mv.getAccount().getAccountNumber() : "") )
+                            .debitCardNumber(mv.getAccount().getDebitCardNumber())
+                            .build();
+                    obj.setAccount(account);
+
+                    return findAndSaveMovements( mv.getAccount().getAccountNumber(), obj,  typeMovement,  accountId, isRegistro);
+
+                    // return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,c.getFee().getMonthlyMovement() , isRegistro );
+                });
+
+                // return  Mono.just(obj);
+            });
+        }else{
+            logger.info("cuentas de debito");
+            String accountId= obj.getAccount().getIdAccount();
+            Boolean isRegistro = true;
+            return findAndSaveMovements( obj.getAccount().getAccountNumber(),   obj,  typeMovement,  accountId, isRegistro);
+        }
+
+
+
+    }
+
+    private Mono<Movement> findAndSaveMovements(String accountNumber,  Movement obj, String typeMovement, String accountId, Boolean isRegistro){
+        Mono<Movement> listmovementAccount = repo.findlastMovementbyAccount(accountNumber);
+
+        logger.info("--Lista de movimientos por cuenta : "+ accountNumber);
         return listmovementAccount
                 .switchIfEmpty( Mono.defer(() -> {
-                    logger.info("No cuenta con ningun movimiento: ");
+                    logger.info("----No cuenta con ningun movimiento: ");
                     Double total = 0.0;
                     Boolean isEmpty = true;
-                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0);
+
+                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0, true);
                 }))
                 .flatMap( listacc -> {
-                    logger.info("Ultimo movimientos por número de cuenta: "+listacc.toString());
-                    Double total = listacc.getBalance();
+                    logger.info("----Ultimo movimientos por número de cuenta: "+listacc.toString());
+
+                    if(isRegistro.equals(false)){
+                        Account account = Account.builder()
+                                .idAccount( (listacc.getAccount().getIdAccount() != null ? listacc.getAccount().getIdAccount() : "") )
+                                .accountNumber( (listacc.getAccount().getAccountNumber() != null ? listacc.getAccount().getAccountNumber() : "") )
+                                .debitCardNumber(obj.getAccount().getDebitCardNumber())
+                                .build();
+                        listacc.setAccount( account );
+                    }
+
+                    Double total = listacc.getBalance() != null ? listacc.getBalance(): 0.0;
+
                     Boolean isEmpty = false;
                     return findAccountByid(accountId)
                             .switchIfEmpty( Mono.defer(() -> {
@@ -83,12 +162,14 @@ public class MovementServiceImpl implements IMovementService {
                                 return Mono.empty();
                             }))
                             .flatMap( c -> {
-                                logger.info("Cuenta con cuenta bancaria: "+ c.getFee().getMonthlyMovement());
-                                return  calculedMovement(total, obj, isEmpty, typeMovement, 0.0,c.getFee().getMonthlyMovement());
+                                logger.info("Cuenta con cuenta bancaria: ");
+                                return calculedMovement(total, (isRegistro.equals(true) ? obj : listacc), isEmpty, typeMovement, 0.0,c.getFee().getMonthlyMovement() , isRegistro );
+
                             });
 
                 });
     }
+
 
 
     /*
@@ -109,8 +190,8 @@ public class MovementServiceImpl implements IMovementService {
                     logger.info("No cuenta con ningun movimiento: ");
                     Double total = 0.0;
                     Boolean isEmpty = true;
-
-                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0);
+                    Boolean isRegistro = true;
+                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0, isRegistro);
                 }))
                 .flatMap( listacc -> {
                     logger.info("Ultimo movimientos por credito: "+listacc.toString());
@@ -125,7 +206,8 @@ public class MovementServiceImpl implements IMovementService {
                             }))
                             .flatMap( c -> {
                                 logger.info("con una tarjeta de credito: "+ c);
-                                return calculedMovement(total, obj, isEmpty, typeMovement, c.getCreditLine(),0);
+                                Boolean isRegistro = true;
+                                return calculedMovement(total, obj, isEmpty, typeMovement, c.getCreditLine(),0, isRegistro);
                             });
 
                 });
@@ -135,8 +217,13 @@ public class MovementServiceImpl implements IMovementService {
     * Método utilizado para realizar los montos finales de acuerdo al tipo de movimiento y se posee comisiones o no
     * El switchIfEmpty carga la informacion del movimiento (balance =0), y luego el flatmap, realiza el calculo y lo registra
     *  */
-    private Mono<Movement> calculedMovement(Double total, Movement obj, Boolean isEmpty, String typeMovement, Double creditLine ,Integer monthlyMovement){
+    private Mono<Movement> calculedMovement(Double total, Movement obj, Boolean isEmpty, String typeMovement, Double creditLine ,Integer monthlyMovement, Boolean isRegistro){
+
+        logger.info("Inicio calculedMovement : "+ total );
         return Mono.just(total).flatMap( t -> {
+
+            logger.info("2 Inicio calculedMovement : "+ isRegistro);
+
             if(isEmpty.equals(false)){
 
                 logger.info("Cantidad de Movimientos: "+ monthlyMovement);
@@ -147,8 +234,18 @@ public class MovementServiceImpl implements IMovementService {
                 }
             }
 
-            if(t < 0 ){
-                throw new ModelNotFoundException(" No puede ser menor a cero: ");
+
+            if(t < 0 || isRegistro.equals(false)){
+                if(typeMovement.equals("account")){
+                    if(t < 0){
+                        Movement mv = new Movement();
+                        return Mono.just(mv);
+                    }else{
+                        return Mono.just(obj);
+                    }
+                }else{
+                    throw new ModelNotFoundException(" No puede ser menor a cero: ");
+                }
             }
             else if ( isEmpty.equals(false) && typeMovement.equals("credit") && t > creditLine ){
                 throw new ModelNotFoundException(" No puede superar la linea de crédito: ");
@@ -243,7 +340,8 @@ public class MovementServiceImpl implements IMovementService {
                     logger.info("No cuenta con ningun movimiento: ");
                     Double total = 0.0;
                     Boolean isEmpty = true;
-                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0);
+                    Boolean isRegistro = true;
+                    return calculedMovement(total, obj, isEmpty, typeMovement, 0.0,0, isRegistro);
                 }))
                 .flatMap( listacc -> {
                     logger.info("Ultimo movimientos por número de cuenta: "+listacc.toString());
@@ -256,7 +354,8 @@ public class MovementServiceImpl implements IMovementService {
                             }))
                             .flatMap( c -> {
                                 logger.info("Cuenta con cuenta bancaria: "+ c.getFee().getMonthlyMovement());
-                                return  calculedMovement(total, obj, isEmpty, typeMovement, 0.0,c.getFee().getMonthlyMovement());
+                                Boolean isRegistro = true;
+                                return  calculedMovement(total, obj, isEmpty, typeMovement, 0.0,c.getFee().getMonthlyMovement(), isRegistro);
                             });
 
                 });

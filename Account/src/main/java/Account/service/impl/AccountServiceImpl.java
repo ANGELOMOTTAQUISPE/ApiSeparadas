@@ -45,8 +45,8 @@ public class AccountServiceImpl  implements IAccountService {
         return webconfig.setUriData("http://"+ip+":8087").flatMapMany(
                 d -> {
                     logger.info("URL: "+d );
-                    Flux<Credit> clientMono = webconfig.getWebclient().get().uri("/api/credit/documentNumber/"+documentNumber).retrieve().bodyToFlux(Credit.class);
-                    return clientMono;
+                    Flux<Credit> creditFlux = webconfig.getWebclient().get().uri("/api/credit/documentNumber/"+documentNumber).retrieve().bodyToFlux(Credit.class);
+                    return creditFlux;
                 }
         );
     }
@@ -78,113 +78,126 @@ public class AccountServiceImpl  implements IAccountService {
                     String AccountType=obj.getAccountType();
                     logger.info(" Profile ");
                     logger.info(" Profile 2 " + cl.getTypeClient().getProfile());
-                    String profileTypeCLient=cl.getTypeClient().getProfile();
+                    Flux<Account> accountbyDebitCard = repo.findByDebitCardNumber(obj.getDebitCardNumber());
+                    Mono<Long> countaccountbyDebitCard = accountbyDebitCard.count();
 
-                    if(profileTypeCLient==null){
-                        logger.info(" Profile null ");
-                        cl.getTypeClient().setProfile("");
-                    }
-                    else{
-                        logger.info(" Profile not null ");
-                        profileTypeCLient=cl.getTypeClient().getProfile();
-                    }
-                    logger.info(" Account Type: "+AccountType);
-                    logger.info(" Profile Type Client   : "+profileTypeCLient);
-                    if (AccountType.equals("a")){
-                        fee.setMonthlyMovement(5);
-                        obj.setFee(fee);
-                    } else if (AccountType.equals("cc")) {
-                        if (profileTypeCLient.equals("PYME")){
-                            fee.setMaintenanceCommission(0.0);
-                        }else{
-                            fee.setMaintenanceCommission(200.0);
+                    return countaccountbyDebitCard.flatMap( countAccount -> {
+
+                        Integer priority = Integer.parseInt(countAccount.toString()) + 1;
+                        String profileTypeCLient=cl.getTypeClient().getProfile();
+
+                        obj.setPriority(priority);
+
+                        if(profileTypeCLient==null){
+                            logger.info(" Profile null ");
+                            profileTypeCLient = "";
+                            cl.getTypeClient().setProfile("");
                         }
-                        fee.setMonthlyMovement(3);
-                        obj.setFee(fee);
-                    } else if (AccountType.equals("pf")) {
-                        fee.setDate(LocalDateTime.now());
-                        fee.setMonthlyMovement(1);
-                        obj.setFee(fee);
-                    }
-                    /* Personal VIP
-                    * Cuenta de ahorro que requiere un monto mínimo de promedio diario cada mes. Adicionalmente,
-                    *  para solicitar este producto el cliente debe tener una tarjeta de crédito con el banco al
-                    *  momento de la creación de la cuenta.
-                    * */
-                    logger.info("Entra condicional " +cl.getTypeClient().getClientType());
-
-                    if(cl.getTypeClient().getClientType().equals("personal")){
-                        logger.info("personal");
-                        Flux<Account> lista = repo.findByAccountClient(documentNumber, AccountType);
-                        Mono<Long> count = lista.count();
-                        return count
-                                .flatMap( c->{
-
-                                    if(c > 0){
-                                        logger.info(" El cliente personal ya tiene una cuenta: "+c);
-                                        throw new ModelNotFoundException(" El cliente personal ya tiene una cuenta: ");
-                                    }else{
-
-                                        logger.info("El cliente puede registrar la cuenta: "+c);
-                                        if (AccountType.equals("a") && cl.getTypeClient().getProfile().equals("VIP")) {
-                                            logger.info("El cliente es VIP y registrara una cuenta de ahorros");
-                                            Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
-
-                                            return countCredit.count()
-                                                .flatMap( ca -> {
-                                                    logger.info("Cantidad de creditos: "+ca);
-                                                    if(ca > 0) {
-                                                        if(obj.getMinimammount() <= ammountmovementInitial){
-                                                            logger.info("El monto minimo es suficiente");
-                                                            return repo.save(obj).flatMap(doAc->{
-                                                                logger.info("Datos registrados de Account: ID:"+doAc.getIdAccount()+ " ACCOUNT NUMBER"+doAc.getAccountNumber());
-                                                                AccountMovementdto movement = AccountMovementdto.builder()
-                                                                        .movement(ammountmovementInitial)
-                                                                        .typeMovement("deposito")
-                                                                        .idAccount(doAc.getIdAccount())
-                                                                        .accountNumber(doAc.getAccountNumber())
-                                                                        .build();
-
-                                                                return registerMovementBydocumentnumber(movement); //Mono.just(doAc);
-                                                            });
-                                                        }else{
-                                                            throw new ModelNotFoundException(" Monto mínimo no suficiente: ");
-                                                        }
-                                                    }else {
-                                                        throw new ModelNotFoundException(" El cliente personal no tiene tarjeta de crédito: ");
-                                                    }
-
-                                                });
-                                        }else {
-                                            logger.info("No es cuenta de ahorro o no es cliente VIP " );
-                                            return repo.save(obj);
-                                        }
-                                    }
-                                });
-                    }else if(cl.getTypeClient().getClientType().equals("empresarial")){
-                        if( AccountType.equals("a") || AccountType.equals("pf") ){
-                            throw new ModelNotFoundException(" El cliente empresarial ya tiene una cuenta: ");
-                        }else{
-                            if (AccountType.equals("cc") && cl.getTypeClient().getProfile().equals("PYME")) {
-                                logger.info("El cliente empresarial es PYME y registrara una cuenta corriente");
-                                Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
-                                return countCredit.count()
-                                        .flatMap( ca -> {
-                                            logger.info("Cantidad de creditos: "+ca);
-                                            if(ca > 0) {
-                                                logger.info("El cliente cuenta con al menos una tarjeta de crédito: ");
-                                                return repo.save(obj);
-                                            }else {
-                                                throw new ModelNotFoundException(" El cliente Empresarial no tiene tarjeta de crédito: ");
-                                            }
-                                        });
+                        else{
+                            logger.info(" Profile not null ");
+                            profileTypeCLient=cl.getTypeClient().getProfile();
+                        }
+                        logger.info(" Account Type: "+AccountType);
+                        logger.info(" Profile Type Client   : "+profileTypeCLient);
+                        if (AccountType.equals("a")){
+                            fee.setMonthlyMovement(5);
+                            obj.setFee(fee);
+                        } else if (AccountType.equals("cc")) {
+                            if (profileTypeCLient.equals("PYME")){
+                                fee.setMaintenanceCommission(0.0);
+                            }else{
+                                fee.setMaintenanceCommission(200.0);
                             }
-                            return repo.save(obj);
+                            fee.setMonthlyMovement(3);
+                            obj.setFee(fee);
+                        } else if (AccountType.equals("pf")) {
+                            fee.setDate(LocalDateTime.now());
+                            fee.setMonthlyMovement(1);
+                            obj.setFee(fee);
                         }
-                    }else{
-                        logger.info("Es otro tipo de cliente " );
-                        return Mono.just(obj);
-                    }
+                        /* Personal VIP
+                        * Cuenta de ahorro que requiere un monto mínimo de promedio diario cada mes. Adicionalmente,
+                        *  para solicitar este producto el cliente debe tener una tarjeta de crédito con el banco al
+                        *  momento de la creación de la cuenta.
+                        * */
+                        logger.info("Entra condicional " +cl.getTypeClient().getClientType());
+
+                        if(cl.getTypeClient().getClientType().equals("personal")){
+                            logger.info("personal");
+                            Flux<Account> lista = repo.findByAccountClient(documentNumber, AccountType);
+                            Mono<Long> count = lista.count();
+                            return count
+                                    .flatMap( c->{
+
+                                        if(c > 0){
+                                            logger.info(" El cliente personal ya tiene una cuenta: "+c);
+                                            throw new ModelNotFoundException(" El cliente personal ya tiene una cuenta: ");
+                                        }else{
+
+                                            logger.info("El cliente puede registrar la cuenta: "+c);
+                                            if (AccountType.equals("a") && cl.getTypeClient().getProfile().equals("VIP")) {
+                                                logger.info("El cliente es VIP y registrara una cuenta de ahorros");
+                                                Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
+
+                                                return countCredit.count()
+                                                    .flatMap( ca -> {
+                                                        logger.info("Cantidad de creditos: "+ca);
+                                                        if(ca > 0) {
+                                                            if(obj.getMinimammount() <= ammountmovementInitial){
+                                                                logger.info("El monto minimo es suficiente");
+                                                                return repo.save(obj).flatMap(doAc->{
+                                                                    logger.info("Datos registrados de Account: ID:"+doAc.getIdAccount()+ " ACCOUNT NUMBER"+doAc.getAccountNumber());
+                                                                    AccountMovementdto movement = AccountMovementdto.builder()
+                                                                            .movement(ammountmovementInitial)
+                                                                            .typeMovement("deposito")
+                                                                            .idAccount(doAc.getIdAccount())
+                                                                            .accountNumber(doAc.getAccountNumber())
+                                                                            .build();
+
+                                                                    return ammountmovementInitial > 0 ? registerMovementBydocumentnumber(movement) : Mono.just(new Movement());
+
+                                                                });
+                                                            }else{
+                                                                throw new ModelNotFoundException(" Monto mínimo no suficiente: ");
+                                                            }
+                                                        }else {
+                                                            throw new ModelNotFoundException(" El cliente personal no tiene tarjeta de crédito: ");
+                                                        }
+
+                                                    });
+                                            }else {
+                                                logger.info("No es cuenta de ahorro o no es cliente VIP " );
+                                                return repo.save(obj);
+                                            }
+                                        }
+                                    });
+                        }else if(cl.getTypeClient().getClientType().equals("empresarial")){
+                            if( AccountType.equals("a") || AccountType.equals("pf") ){
+                                throw new ModelNotFoundException(" cliente empresarial no puede tener una cuenta de ahorro o de plazo fijo pero sí múltiples cuentas corrientes ");
+                            }else{
+                                if (AccountType.equals("cc") && cl.getTypeClient().getProfile().equals("PYME")) {
+                                    logger.info("El cliente empresarial es PYME y registrara una cuenta corriente");
+                                    Flux<Credit> countCredit = findCreditBydocumentnumber(documentNumber);
+                                    return countCredit.count()
+                                            .flatMap( ca -> {
+                                                logger.info("Cantidad de creditos: "+ca);
+                                                if(ca > 0) {
+                                                    logger.info("El cliente cuenta con al menos una tarjeta de crédito: ");
+                                                    return repo.save(obj);
+                                                }else {
+                                                    throw new ModelNotFoundException(" El cliente Empresarial no tiene tarjeta de crédito: ");
+                                                }
+                                            });
+                                }
+                                return repo.save(obj);
+                            }
+                        }else{
+                            logger.info("Es otro tipo de cliente " );
+                            return Mono.just(obj);
+                        }
+
+
+                    });
                 })
                 .then(  Mono.just(obj) );
     }
@@ -199,6 +212,10 @@ public class AccountServiceImpl  implements IAccountService {
 
     public Mono<Account> listofId(String id) {
         Mono<Account> op = repo.findById(id);
+        return op;
+    }
+    public Flux<Account> listByDebitCardNumber(String debitCardNumber) {
+        Flux<Account> op = repo.findByDebitCardNumber(debitCardNumber);
         return op;
     }
     public Mono<Account> delete(String id) {

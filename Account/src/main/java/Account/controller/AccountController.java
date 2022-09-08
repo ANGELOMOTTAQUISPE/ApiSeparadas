@@ -34,6 +34,7 @@ public class AccountController {
         }
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
+
     @PostMapping
     public ResponseEntity<Mono<Account>> register(@RequestBody Accountdto checkingdto){
         logger.info("Inicio metodo register() de AccountController");
@@ -48,6 +49,7 @@ public class AccountController {
                 .accountNumber(checkingdto.getAccountNumber())
                 .accountType(checkingdto.getAccountType())
                 .minimammount(checkingdto.getMinimammount())
+                .debitCardNumber(checkingdto.getDebitCardNumber())
                 .client(client)
                 .build();
         Double ammountmovementInitial = checkingdto.getAmmountmovementInitial();
@@ -87,6 +89,14 @@ public class AccountController {
     public ResponseEntity<Mono<Account>> listCreditById(@PathVariable("id") String id){
         logger.info("Inicio metodo listCreditById() de AccountController");
         Mono<Account> account = service.listofId(id);
+        logger.info("FIN metodo listCreditById() de AccountController");
+        return new ResponseEntity<>(account, HttpStatus.OK);
+    }
+    @GetMapping("/debitcardnumber/{debitcardnumber}")
+    @CircuitBreaker(name="account", fallbackMethod = "fallBackGetCreditbyId")
+    public ResponseEntity<Flux<Account>> listAccountbyDebitCardNumber(@PathVariable("debitcardnumber") String debitcardnumber){
+        logger.info("Inicio metodo listCreditById() de AccountController");
+        Flux<Account> account = service.listByDebitCardNumber(debitcardnumber);
         logger.info("FIN metodo listCreditById() de AccountController");
         return new ResponseEntity<>(account, HttpStatus.OK);
     }

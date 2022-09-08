@@ -15,5 +15,4 @@ public class BankTransferetdto {
     private String numberAccountdestination;
     private String idAccountaDestination;
     private Double amount;
-    private String typeMovement;
 }

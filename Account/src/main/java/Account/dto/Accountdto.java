@@ -13,6 +13,7 @@ import java.util.List;
 public class Accountdto {
     private String accountNumber;
     private String accountType;
+    private String debitCardNumber;
     private Double minimammount;
     private Double ammountmovementInitial;
     private String idClient;

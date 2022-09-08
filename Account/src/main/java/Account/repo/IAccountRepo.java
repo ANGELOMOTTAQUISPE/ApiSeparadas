@@ -11,4 +11,6 @@ public interface IAccountRepo extends ReactiveMongoRepository<Account, String> {
     @Query(value = "{'client.documentNumber' : ?0, accountType: ?1 }")
     Flux<Account> findByAccountClient(String documentNumber, String accountType);
 
+    Flux<Account> findByDebitCardNumber(String debitCardNumber);
+
 }

@@ -12,5 +12,5 @@ public interface IAccountService extends ICRUD<Account, String>{
     public Mono<Client> findClientByDni(String documentNumber);
     public Flux<Credit> findCreditBydocumentnumber(String documentNumber);
     public Mono<Movement> registerMovementBydocumentnumber(AccountMovementdto movement);
-
+    public Flux<Account> listByDebitCardNumber(String debitCardNumber);
 }
