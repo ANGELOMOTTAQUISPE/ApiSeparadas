@@ -8,7 +8,7 @@ jobs:
     name: deploy to docker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@ApiSeparadas
+      - uses: actions/checkout@v1
       - name: build and push to docker
         uses: docker/build-push-action@v1
         with:
