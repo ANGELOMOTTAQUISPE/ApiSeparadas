@@ -8,11 +8,11 @@ my:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/businessbanking
+      uri: mongodb://192.168.232.130:10500/businessbanking
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8099/eureka
+      defaultZone: http://192.168.232.130:8099/eureka
 
 management:
   health:

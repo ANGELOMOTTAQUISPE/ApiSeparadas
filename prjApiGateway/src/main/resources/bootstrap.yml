@@ -4,7 +4,7 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: http://localhost:8099
+      uri: http://192.168.232.130:8099
   security:
     user:
       name: root
