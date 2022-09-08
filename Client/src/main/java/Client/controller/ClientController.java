@@ -36,7 +36,7 @@ public class ClientController {
     @PostMapping
     public ResponseEntity<Mono<Client>> register(@RequestBody Client client){
         logger.info("Inicio metodo register() de ClientController");
-        Mono<Client> p = null;
+        Mono<Client> p = Mono.empty();
         try {
             p = service.register(client);
 
