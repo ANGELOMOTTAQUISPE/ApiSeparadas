@@ -31,7 +31,7 @@ public class ClientController {
         }finally {
             logger.info( "Fin metodo list() de ClientController");
         }
-        return new ResponseEntity<Flux<Client>>(lista, HttpStatus.OK);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
     @PostMapping
     public ResponseEntity<Mono<Client>> register(@RequestBody Client client){
@@ -46,7 +46,7 @@ public class ClientController {
         }finally {
             logger.info( "Fin metodo register() de ClientController");
         }
-        return new ResponseEntity<Mono<Client>>(p, HttpStatus.CREATED);
+        return new ResponseEntity<>(p, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id) {
@@ -67,7 +67,7 @@ public class ClientController {
         }finally {
             logger.info( "Fin metodo clientbydocumentNumber() de ClientController");
         }
-        return new ResponseEntity<Mono<Client>>(lista, HttpStatus.OK);
+        return new ResponseEntity<>(lista, HttpStatus.OK);
     }
     @PutMapping
     public ResponseEntity<Mono<Client>> update(@RequestBody Client client){
@@ -82,7 +82,7 @@ public class ClientController {
         }finally {
             logger.info( "Fin metodo clientbydocumentNumber() de ClientController");
         }
-        return new ResponseEntity<Mono<Client>>(p, HttpStatus.OK);
+        return new ResponseEntity<>(p, HttpStatus.OK);
     }
     public ResponseEntity<Mono<Client>> fallBackGetClientbyDocumentNumber(String documentNumber, RuntimeException runtimeException){
         return new ResponseEntity("Microservicio Client no funciona",HttpStatus.OK);

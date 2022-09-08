@@ -1,0 +1,6 @@
+projectKey=gene.bah:CreditSonar
+serverUrl=http://localhost:9000
+serverVersion=9.6.1.59531
+dashboardUrl=http://localhost:9000/dashboard?id=gene.bah%3ACreditSonar
+ceTaskId=AYMepwRKg9ZpJi4GK28k
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYMepwRKg9ZpJi4GK28k

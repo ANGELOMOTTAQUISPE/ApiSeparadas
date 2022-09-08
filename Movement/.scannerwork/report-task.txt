@@ -1,0 +1,6 @@
+projectKey=gene.bah:MovementSonar
+serverUrl=http://localhost:9000
+serverVersion=9.6.1.59531
+dashboardUrl=http://localhost:9000/dashboard?id=gene.bah%3AMovementSonar
+ceTaskId=AYMeqa93g9ZpJi4GK28w
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYMeqa93g9ZpJi4GK28w

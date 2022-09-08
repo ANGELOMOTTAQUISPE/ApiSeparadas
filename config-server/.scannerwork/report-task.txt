@@ -1,0 +1,6 @@
+projectKey=gene.bah:ConfigServer
+serverUrl=http://localhost:9000
+serverVersion=9.6.1.59531
+dashboardUrl=http://localhost:9000/dashboard?id=gene.bah%3AConfigServer
+ceTaskId=AYMes-jJg9ZpJi4GK29V
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYMes-jJg9ZpJi4GK29V

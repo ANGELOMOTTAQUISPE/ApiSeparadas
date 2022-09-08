@@ -1,0 +1,6 @@
+projectKey=gene.bah:ApiGateway
+serverUrl=http://localhost:9000
+serverVersion=9.6.1.59531
+dashboardUrl=http://localhost:9000/dashboard?id=gene.bah%3AApiGateway
+ceTaskId=AYMesFGTg9ZpJi4GK29J
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYMesFGTg9ZpJi4GK29J
