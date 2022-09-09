@@ -1,0 +1,419 @@
+{
+	"info": {
+		"_postman_id": "e1988093-1a04-4a40-92fd-48726ef81b1e",
+		"name": "Proyecto1_Microservicio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Proyecto1",
+			"item": [
+				{
+					"name": "Client",
+					"item": [
+						{
+							"name": "POST_RegistrarClient",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"PEPITO SAC\",\r\n    \"documentNumber\":\"21458963256\",\r\n    \"documentType\": \"RUC\",\r\n    \"typeClient\": {\r\n        \"clientType\":\"empresarial\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.232.130:8085/api/client",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"232",
+										"130"
+									],
+									"port": "8085",
+									"path": [
+										"api",
+										"client"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE_EliminarClient",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://192.168.232.130:8085/api/client/63128545edcf6863e3c73d16",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"232",
+										"130"
+									],
+									"port": "8085",
+									"path": [
+										"api",
+										"client",
+										"63128545edcf6863e3c73d16"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET_ListarClient",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8085/api/client",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8085",
+									"path": [
+										"api",
+										"client"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PUT_ActualizarClient",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"idClient\": \"630314112de09031b5d84fc3\",\r\n    \"clientType\": \"personal\",\r\n    \"name\": \"Angelo Motta\",\r\n    \"documentNumber\": \"75399757\",\r\n    \"documentType\": \"DNI\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://192.168.232.130:8085/api/client",
+									"protocol": "http",
+									"host": [
+										"192",
+										"168",
+										"232",
+										"130"
+									],
+									"port": "8085",
+									"path": [
+										"api",
+										"client"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Account",
+					"item": [
+						{
+							"name": "POST_RegistrarAccount",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"accountNumber\": \"02354507444706876327\",\r\n  \"accountType\": \"cc\",\r\n  \"debitCardNumber\": \"4006889513834539\",\r\n  \"minimammount\": 0,\r\n  \"ammountmovementInitial\":0,\r\n  \"idClient\": \"630ec2848842d153ee2b592a\",\r\n  \"documentNumber\": \"21563258745\"\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8086/api/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8086",
+									"path": [
+										"api",
+										"account"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET_ListarAccount",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8086/api/account",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8086",
+									"path": [
+										"api",
+										"account"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Credit",
+					"item": [
+						{
+							"name": "POST_Registrarcredit",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"creditCardNumber\": \"4754-9821-3777-1568\",\r\n    \"creditLine\": 4000,\r\n    \"idClient\": \"630c2fdf1c3970359dd29ac3\",\r\n    \"documentNumber\": \"75399757\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8087/api/credit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8087",
+									"path": [
+										"api",
+										"credit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET_ListarCredit",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"creditCardNumber\": \"3724-6753-3805-975\",\r\n  \"creditLine\": 3000,\r\n  \"client\": {\r\n    \"idClient\": \"630313712de09031b5d84fc1\",\r\n    \"documentNumber\": \"26325478965\"\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8087/api/credit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8087",
+									"path": [
+										"api",
+										"credit"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST_Credit",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"creditCardNumber\": \"3724-6753-3805-975\",\r\n  \"creditLine\": 3000,\r\n  \"client\": {\r\n    \"idClient\": \"630313712de09031b5d84fc1\",\r\n    \"documentNumber\": \"26325478965\"\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8089/api/credit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8089",
+									"path": [
+										"api",
+										"credit"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Movement",
+					"item": [
+						{
+							"name": "POST_RegistrarMovementCredit",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"movement\": 40,\r\n    \"typeMovement\": \"deposito\",\r\n    \"idAccount\": \"63119e06f9c7f2411c8f3fed\",\r\n    \"accountNumber\": \"02354507444706875613\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8088/api/movement/accountmovement",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8088",
+									"path": [
+										"api",
+										"movement",
+										"accountmovement"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST_RegistrarMovementAccount",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"movement\": 300,\r\n    \"typeMovement\": \"credito\",\r\n    \"idCredit\": \"631266bcc3632f2a9b418bf4\",\r\n    \"creditCardNumber\": \"4754-9821-3777-1568\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8088/api/movement/creditmovement",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8088",
+									"path": [
+										"api",
+										"movement",
+										"creditmovement"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET_ListarMovement",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"balance\": 51000,\r\n    \"movement\": 300,\r\n    \"typeMovement\": \"deposito\",\r\n    \"idAccount\": \"6303251f5cc86e430b334674\",\r\n    \"accountNumber\": \"20800414795328833328\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8088/api/movement/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8088",
+									"path": [
+										"api",
+										"movement",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Cloud",
+					"item": [
+						{
+							"name": "GET_Actuator",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8888/client-service/default",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8888",
+									"path": [
+										"client-service",
+										"default"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8086/actuator/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8086",
+									"path": [
+										"actuator",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
