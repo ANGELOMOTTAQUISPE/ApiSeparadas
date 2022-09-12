@@ -1,6 +1,7 @@
 package Credit.service.impl;
 
 import Credit.config.WebClientConfig;
+import Credit.exception.ModelNotFoundException;
 import Credit.model.Client;
 import Credit.model.Credit;
 import Credit.repo.ICreditRepo;
@@ -49,7 +50,7 @@ public class CreditServiceImpl implements ICreditService {
                                     logger.info("Contamos la lista de creditos: "+c);
                                     if(c>0){
                                         logger.info("Posee mas de un credito: "+c);
-                                        throw new UserAlreadyPresentException(" El cliente ya tiene un credito: "+c);
+                                        throw new ModelNotFoundException(" El cliente ya tiene un credito: "+c);
                                         //return Mono.just("El cliente ya tiene un credito");
                                     }else{
                                         logger.info("No posee credito: "+c);
@@ -90,10 +91,4 @@ public class CreditServiceImpl implements ICreditService {
     }
 
 
-    class UserAlreadyPresentException extends RuntimeException {
-
-        public UserAlreadyPresentException(String email) {
-            super("User already present with email " + email);
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package Client.controller;
 
+import Client.exception.ModelNotFoundException;
 import Client.model.Client;
 import Client.service.IClientService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -27,7 +28,7 @@ public class ClientController {
 
         } catch (Exception e) {
             logger.info("Ocurrio un error " + e.getMessage());
-
+            throw new ModelNotFoundException(e.getMessage());
         }finally {
             logger.info( "Fin metodo list() de ClientController");
         }
