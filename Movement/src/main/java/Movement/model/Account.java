@@ -23,8 +23,10 @@ public class Account {
     private String accountType;
     private String debitCardNumber;
     private Integer priority;
+    private Double minimammount;
     private Fee fee;
     private Client client;
     private List<String> headline;
     private List<String> authorizedSignatures;
+    private String associatedCard;
 }

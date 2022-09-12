@@ -43,4 +43,5 @@ public class Account {
     private Client client;
     private List<String> headline;
     private List<String> authorizedSignatures;
+    private String associatedCard;
 }

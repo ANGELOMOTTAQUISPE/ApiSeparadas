@@ -16,6 +16,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class AccountServiceImpl  implements IAccountService {
@@ -78,7 +82,9 @@ public class AccountServiceImpl  implements IAccountService {
                     String AccountType=obj.getAccountType();
                     logger.info(" Profile ");
                     logger.info(" Profile 2 " + cl.getTypeClient().getProfile());
+                    String debitCardNumber = obj.getDebitCardNumber() == null ? "" : obj.getDebitCardNumber();
                     Flux<Account> accountbyDebitCard = repo.findByDebitCardNumber(obj.getDebitCardNumber());
+
                     Mono<Long> countaccountbyDebitCard = accountbyDebitCard.count();
 
                     return countaccountbyDebitCard.flatMap( countAccount -> {
@@ -86,7 +92,7 @@ public class AccountServiceImpl  implements IAccountService {
                         Integer priority = Integer.parseInt(countAccount.toString()) + 1;
                         String profileTypeCLient=cl.getTypeClient().getProfile();
 
-                        obj.setPriority(priority);
+                        obj.setPriority( obj.getDebitCardNumber() == null ? null : priority );
 
                         if(profileTypeCLient==null){
                             logger.info(" Profile null ");
@@ -120,9 +126,13 @@ public class AccountServiceImpl  implements IAccountService {
                         *  para solicitar este producto el cliente debe tener una tarjeta de crédito con el banco al
                         *  momento de la creación de la cuenta.
                         * */
-                        logger.info("Entra condicional " +cl.getTypeClient().getClientType());
+                        List<String> listtypeclient=cl.getTypeClient().getClientType();
+                        Stream datospersonal=listtypeclient.stream().filter(a->a.equals("personal"));
+                        List<String> datos=listtypeclient.stream().filter(a->a.equals("personal")).collect(Collectors.toList());
+                        logger.info("Tipo client" +listtypeclient);
 
-                        if(cl.getTypeClient().getClientType().equals("personal")){
+                        //if(cl.getTypeClient().getClientType().equals("personal")){
+                        if(listtypeclient.contains("personal") && !obj.getAccountType().equals("m")){
                             logger.info("personal");
                             Flux<Account> lista = repo.findByAccountClient(documentNumber, AccountType);
                             Mono<Long> count = lista.count();
@@ -171,7 +181,8 @@ public class AccountServiceImpl  implements IAccountService {
                                             }
                                         }
                                     });
-                        }else if(cl.getTypeClient().getClientType().equals("empresarial")){
+                        }else if(listtypeclient.contains("empresarial") && !obj.getAccountType().equals("m")){
+                        //}else if(cl.getTypeClient().getClientType().equals("empresarial")){
                             if( AccountType.equals("a") || AccountType.equals("pf") ){
                                 throw new ModelNotFoundException(" cliente empresarial no puede tener una cuenta de ahorro o de plazo fijo pero sí múltiples cuentas corrientes ");
                             }else{
@@ -191,8 +202,14 @@ public class AccountServiceImpl  implements IAccountService {
                                 }
                                 return repo.save(obj);
                             }
-                        }else{
-                            logger.info("Es otro tipo de cliente " );
+                        } else if (listtypeclient.contains("movil") && obj.getAccountType().equals("m")&& cl.getDocumentType().equals("DNI")) {
+                            logger.info("Tipo documento cliente: "+cl.getDocumentType());
+                            logger.info("El cliente movil esta creando un monedero");
+                            obj.setPriority(null);
+                            return repo.save(obj);
+                        } else{
+                            logger.info("Es otro tipo de cliente  no valido" );
+
                             return Mono.just(obj);
                         }
 
@@ -216,6 +233,12 @@ public class AccountServiceImpl  implements IAccountService {
     }
     public Flux<Account> listByDebitCardNumber(String debitCardNumber) {
         Flux<Account> op = repo.findByDebitCardNumber(debitCardNumber);
+        return op;
+    }
+    public Flux<Account> findaccountbydocumentNumberandaccountype( String documentNumber,String accountType) {
+        logger.info("Numero de documento"+documentNumber );
+        logger.info("tipo de cuente"+accountType );
+        Flux<Account> op = repo.findByAccountClient(documentNumber,accountType);
         return op;
     }
     public Mono<Account> delete(String id) {

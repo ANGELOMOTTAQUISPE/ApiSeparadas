@@ -70,6 +70,22 @@ public class ClientController {
         }
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
+    @CircuitBreaker(name="client", fallbackMethod = "fallBackGetClientbyDocumentNumber")
+    @GetMapping("/phoneNumber/{phoneNumber}")
+    public ResponseEntity<Mono<Client>> clientbyphonenumber(@PathVariable("phoneNumber") String phoneNumber){
+        logger.info("Inicio metodo clientbyphonenumber() de ClientController");
+        Mono<Client> lista = Mono.empty();
+        try {
+            lista = service.clentbyphoneNumber(phoneNumber);
+
+        } catch (Exception e) {
+            logger.info("Ocurrio un error " + e.getMessage());
+
+        }finally {
+            logger.info( "Fin metodo clientbyphonenumber() de ClientController");
+        }
+        return new ResponseEntity<>(lista, HttpStatus.OK);
+    }
     @PutMapping
     public ResponseEntity<Mono<Client>> update(@RequestBody Client client){
         logger.info("Inicio metodo update() de ClientController");

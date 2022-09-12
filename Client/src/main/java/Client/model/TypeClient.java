@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 
 @Builder
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TypeClient {
-    private String clientType;
+    private List<String> clientType;
     private String profile;
+    private String imei;
 }

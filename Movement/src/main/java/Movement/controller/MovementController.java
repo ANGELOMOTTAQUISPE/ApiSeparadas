@@ -64,15 +64,20 @@ public class MovementController {
         Account account = Account.builder()
                 .idAccount( (accountmovement.getIdAccount() != null ? accountmovement.getIdAccount() : "") )
                 .accountNumber( (accountmovement.getAccountNumber() != null ? accountmovement.getAccountNumber() : "") )
-                .debitCardNumber(accountmovement.getDebitcardnumber())
+                .debitCardNumber( accountmovement.getDebitcardnumber())
                 .build();
+        logger.info("account--- " + account.toString());
         Movement movement = Movement.builder()
                 .movement(accountmovement.getMovement())
                 .typeMovement(accountmovement.getTypeMovement())
                 .account(account)
                 .movementDate(LocalDateTime.now())
-
+                .phoneNumber(accountmovement.getPhoneNumber())
                 .build();
+
+
+        logger.info("movement--- " + movement.toString());
+
         try {
             p = service.registerAccount(movement);
 

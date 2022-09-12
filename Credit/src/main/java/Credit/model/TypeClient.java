@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Builder
 @Data
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TypeClient {
-    private String clientType;
+    private List<String> clientType;
     private String profile;
+    private String imei;
 }

@@ -100,6 +100,13 @@ public class AccountController {
         logger.info("FIN metodo listCreditById() de AccountController");
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
+    @GetMapping("/documentNumberandaccountType/{documentNumber}/{accountType}")
+    public ResponseEntity<Flux<Account>> findaccountbydocumentNumberandaccountype(@PathVariable("documentNumber") String documentNumber,@PathVariable("accountType") String accountType){
+        logger.info("Inicio metodo findaccountbyphonenumber() de AccountController");
+        Flux<Account> account = service.findaccountbydocumentNumberandaccountype(documentNumber,accountType);
+        logger.info("FIN metodo findaccountbyphonenumber() de AccountController");
+        return new ResponseEntity<Flux<Account>>(account, HttpStatus.OK);
+    }
     public ResponseEntity<Mono<String>> fallBackGetCreditbyId(@PathVariable("id") String id, RuntimeException e){
         return new ResponseEntity("Microservicio Account no funciona",HttpStatus.OK);
     }

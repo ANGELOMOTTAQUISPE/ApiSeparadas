@@ -20,5 +20,7 @@ public class Client {
     private String name;
     private String documentNumber;
     private String documentType;
+    private String phoneNumber;
+    private String email;
     private TypeClient typeClient;
 }

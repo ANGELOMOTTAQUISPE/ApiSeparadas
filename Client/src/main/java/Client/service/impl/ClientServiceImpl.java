@@ -37,4 +37,7 @@ public class ClientServiceImpl implements IClientService {
     public Mono<Client> clientbydocumentNumber (String documentNumber){
         return repo.findByDocumentNumber(documentNumber);
     }
+    public Mono<Client> clentbyphoneNumber (String documentNumber){
+        return repo.findByPhoneNumber(documentNumber);
+    }
 }

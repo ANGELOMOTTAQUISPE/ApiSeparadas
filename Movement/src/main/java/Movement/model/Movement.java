@@ -25,4 +25,5 @@ public class Movement {
     private Credit credit;
     private LocalDateTime movementDate;
     private Double commission;
+    private String phoneNumber;
 }

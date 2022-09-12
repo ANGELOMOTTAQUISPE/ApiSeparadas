@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+
 @Service
 public class CreditServiceImpl implements ICreditService {
     @Value("${my.property.ip}")
@@ -40,13 +43,15 @@ public class CreditServiceImpl implements ICreditService {
         String documentNumber =obj.getClient().getDocumentNumber();
         return findByApiClient(obj.getClient())
                 .flatMap( cl -> {
-                    if(cl.getTypeClient().getClientType().equals("personal")){
+                    List<String> listtypeclient=cl.getTypeClient().getClientType();
+                    logger.info("Tipo client" +listtypeclient);
+                    //if(cl.getTypeClient().getClientType().equals("personal")){
+                    if(listtypeclient.contains("personal") ){
                         logger.info("personal");
                         Flux<Credit> lista = repo.findByClient(documentNumber);
                         Mono<Long> count = lista.count();
                         return count
                                 .flatMap( c->{
-                                    //Mono<Long> cant = null;
                                     logger.info("Contamos la lista de creditos: "+c);
                                     if(c>0){
                                         logger.info("Posee mas de un credito: "+c);
@@ -57,10 +62,12 @@ public class CreditServiceImpl implements ICreditService {
                                         return repo.save(obj);
                                     }
                                 });
-                    }else if(cl.getTypeClient().getClientType().equals("empresarial")){
+                    }else if(listtypeclient.contains("empresarial")){
+                    //}else if(cl.getTypeClient().getClientType().equals("empresarial")){
                         logger.info("empresarial: " + obj.getIdCredit() + " - " +  obj.getCreditCardNumber());
                         return repo.save(obj);
                     }else{
+                        logger.info("Es otro tipo de cliente no valido" );
                         return Mono.just(obj);
                     }
                 })
